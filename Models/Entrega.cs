@@ -13,9 +13,11 @@ namespace Proyecto1_Paula_Ulate.Models
         public string EntregadoPor { get; set; }
 
         // Relación con Solicitud
+
         public int SolicitudId { get; set; }
         public Solicitud Solicitud { get; set; }
 
         public string Observaciones { get; set; }
+        public string RecibidoPor { get; set; }
     }
 }
