@@ -124,6 +124,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="LogicaDatos\ConexionBaseDatos.cs" />
+    <Compile Include="LogicaDatos\EntregaRepository.cs" />
+    <Compile Include="LogicaDatos\RepuestoRepository.cs" />
+    <Compile Include="LogicaDatos\SolicitudRepository.cs" />
+    <Compile Include="LogicaDatos\UsuarioRepositorio.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Models\Entrega.cs" />
     <Compile Include="Models\Repuesto.cs" />
