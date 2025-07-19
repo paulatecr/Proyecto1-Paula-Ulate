@@ -1,0 +1,104 @@
+﻿/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+
+.navbar {
+    background-color: mediumpurple;
+    padding: 15px 30px;
+    font-weight: bold;
+    color: black;
+    font-size: 22px;
+}
+
+.navbar-brand {
+    background-color: mediumpurple; 
+}
+
+
+.form-container h1 {
+    width: 100%;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #4A148C;
+    text-align: center;
+    text-shadow: 1px 1px 2px #ccc;
+    border-bottom: 2px solid #4A148C;
+    padding-bottom: 10px;
+}
+
+.form-container label {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.form-container {
+    margin: 40px auto; 
+    width: 400px;
+    padding: 20px;
+    border: 2px solid #00bcd4;
+    border-radius: 15px;
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+}
+
+input, select {
+    display: block;
+    margin: 5px 0px 15px 5px;
+    padding: 5px;
+    width: 350px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.button {
+    padding: 8px 16px;
+    background-color: #4A148C;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#datoTabla {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 2px solid #00bcd4;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 800px;
+    table-layout: fixed;
+    word-wrap: break-word;
+    text-align: center;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #808080;
+}
+
+th {
+    background-color: #e0e0e0;
+    font-weight: bold;
+
+}
+
+td {
+    word-wrap: break-word;
+    white-space: normal;
+}
