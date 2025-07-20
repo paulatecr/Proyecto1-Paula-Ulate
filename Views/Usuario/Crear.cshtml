@@ -1,0 +1,32 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Usuario
+
+@{
+    ViewBag.Title = "Crear Nuevo Usuario";
+}
+
+<h2>Crear Nuevo Usuario</h2>
+
+@using (Html.BeginForm())
+{
+    <div class="form-container">
+        <label for="Nombre">Nombre:</label>
+        @Html.TextBoxFor(m => m.Nombre, new { required = "required" })
+
+        <label for="Correo">Correo:</label>
+        @Html.TextBoxFor(m => m.Correo, new { required = "required", type = "email" })
+
+        <label for="Contraseña">Contraseña:</label>
+        @Html.PasswordFor(m => m.Contraseña, new { required = "required" })
+
+        @Html.LabelFor(m => m.Rol)
+        @Html.DropDownListFor(m => m.Rol,
+            new SelectList(new[] {
+                new { Value = "Administrador", Text = "Administrador" },
+                new { Value = "Usuario", Text = "Usuario" }
+            }, "Value", "Text"),
+            "-- Seleccione un rol --",
+            new { @class = "form-control", required = "required" })
+
+        <button type="submit" class="button">Registrar</button>
+    </div>
+}

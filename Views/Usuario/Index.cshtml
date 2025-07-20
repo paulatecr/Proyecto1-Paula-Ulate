@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "Lista de Usuarios";
+}
+
+<h2>Usuarios Existentes</h2>
+<p>@Html.ActionLink("Crear Nuevo Usuario", "Crear")</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Contraseña</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Id</td>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Contraseña</td>
+            </tr>
+        }
+    </tbody>
+</table>

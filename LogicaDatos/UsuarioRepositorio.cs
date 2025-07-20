@@ -11,7 +11,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
     {
         private readonly string _connectionString;
 
-        public UsuarioRepository(string connectionString)
+        public UsuarioRepositorio(string connectionString)
         {
             _connectionString = connectionString;
         }

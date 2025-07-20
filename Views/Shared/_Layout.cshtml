@@ -3,54 +3,58 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Proyecto 1 - Paula Ulate - Aplicación para Bodega de Repuestos </title>
+    <title>@ViewBag.Title - Proyecto 1 - Paula Ulate - Aplicación para Bodega de Repuestos</title>
+
     @Styles.Render("~/Content/css")
     <link href="~/Content/Style.css" rel="stylesheet" />
     @Scripts.Render("~/bundles/modernizr")
+
+    @{
+        var user = Session["UsuarioLogueado"] as Proyecto1_Paula_Ulate.Models.Usuario;
+    }
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm">
-            <div class="container">
-                @Html.ActionLink("Proyecto 1-  Paula Ulate - Bodega de Repuestos", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        title="Toggle navigation" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li> @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                        <li> @Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+<body class="@((user != null) ? user.Tema + " letra-" + user.TamañoLetra : "")">
 
-                        @if (Session["Usuario"] != null)
+        <header>
+            <nav class="navbar">
+                <div class="navbar-container">
+                    <span class="titulo-navbar">Proyecto 1 - Paula Ulate</span>
+
+                    <ul class="menu-navbar">
+                        @if (user == null)
                         {
-                                <li> @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                                <li> @Html.ActionLink("Usuarios", "Usuario", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                                <li> @Html.ActionLink("Repuestos", "Repuesto", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                                <li> @Html.ActionLink("Solicitudes", "Solicitud", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                                <li> @Html.ActionLink("Entregas", "Entrega", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                                <li> @Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                         }
+                            <li>@Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Contacto", "Contact", "Home", null, new { @class = "nav-link" })</li>
+                        }
+                        else
+                        {
+                            <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
 
+                            if (user.Rol == "Administrador")
+                            {
+                                <li>@Html.ActionLink("Usuarios Existentes", "Index", "Usuario", null, new { @class = "nav-link" })</li>
+                            }
+
+                            <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
+                        }
                     </ul>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </header>
 
-    </header>
-    
+        <div class="container mt-4">
+            @RenderBody()
+            <hr />
+            <footer>
+                <p>&copy; @DateTime.Now.Year - Proyecto 1 - Paula Ulate</p>
+            </footer>
+        </div>
 
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Proyecto 1 - Paula Ulate</p>
-        </footer>
-    </div>
-
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
-</body>
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+    </body>
 </html>

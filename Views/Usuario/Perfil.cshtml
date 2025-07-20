@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewBag.Title = "Mi Perfil de Usuario";
+}
+
+<div class="form-container">
+    <h1>Mi Perfil</h1>
+
+    <p><strong>Nombre:</strong> @Model.Nombre</p>
+    <p><strong>Correo:</strong> @Model.Correo</p>
+    <p><strong>Rol:</strong> @Model.Rol</p>
+
+    <div style="margin-top:20px;">
+        @Html.ActionLink("Editar Perfil", "Editar", "Usuario", null, new { @class = "button" })
+    </div>
+</div>
+

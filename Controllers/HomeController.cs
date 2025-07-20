@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Proyecto1_Paula_Ulate.LogicaDatos;
+using Proyecto1_Paula_Ulate.Models;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -13,18 +16,28 @@ namespace Proyecto1_Paula_Ulate.Controllers
             return View();
         }
 
+        public ActionResult Contact()
+        {
+            return View();
+        }
+
         [HttpPost]
         public ActionResult Login(string usuario, string contrasena)
         {
-            // Ejemplo básico. Cambia esto luego por validación real desde la base de datos
-            if (usuario == "admin" && contrasena == "1234")
-            {
-                Session["Usuario"] = usuario;
-                return RedirectToAction("Index", "Usuario");
-            }
+            var repo = new UsuarioRepositorio(ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString);
+            var usuarios = repo.ObtenerTodos();
+            var user = usuarios.FirstOrDefault(u => u.Nombre == usuario && u.Contraseña == contrasena);
 
-            ViewBag.Mensaje = "Credenciales inválidas. Intente de nuevo.";
-            return View("Index");
+            if (user != null)
+            {
+                Session["UsuarioLogueado"] = user;
+                return RedirectToAction("Perfil", "Usuario");
+            }
+            else
+            {
+                ViewBag.Mensaje = "Credenciales incorrectas.";
+                return View("Index");
+            }
         }
 
         public ActionResult CerrarSesion()
@@ -32,6 +45,8 @@ namespace Proyecto1_Paula_Ulate.Controllers
             Session.Clear();
             return RedirectToAction("Index", "Home");
         }
+
+
 
     }
 }

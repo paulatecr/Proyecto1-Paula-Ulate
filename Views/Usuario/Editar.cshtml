@@ -1,0 +1,83 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Usuario
+
+@{
+    ViewBag.Title = "Editar Perfil";
+    var usuarioSesion = Session["UsuarioLogueado"] as Proyecto1_Paula_Ulate.Models.Usuario;
+}
+
+<div class="form-container">
+    <h1>Editar Perfil</h1>
+
+    @if (ViewBag.Mensaje != null)
+    {
+        <p style="color: green;">@ViewBag.Mensaje</p>
+    }
+
+    @using (Html.BeginForm())
+    {
+        if (usuarioSesion != null && usuarioSesion.Rol == "Administrador")
+        {
+            @Html.LabelFor(m => m.Nombre)
+            @Html.TextBoxFor(m => m.Nombre)
+            @Html.ValidationMessageFor(m => m.Nombre)
+
+            @Html.LabelFor(m => m.Correo)
+            @Html.TextBoxFor(m => m.Correo)
+            @Html.ValidationMessageFor(m => m.Correo)
+        }
+        else
+        {
+            <label>Nombre:</label>
+            <p>@Model.Nombre</p>
+            @Html.HiddenFor(m => m.Nombre)
+
+            <label>Correo:</label>
+            <p>@Model.Correo</p>
+            @Html.HiddenFor(m => m.Correo)
+        }
+
+        <h4>Cambiar contraseña</h4>
+
+        if (ViewBag.ErrorContrasena != null)
+        {
+            <p style="color:red">@ViewBag.ErrorContrasena</p>
+        }
+
+        <label for="NuevaContrasena">Nueva contraseña:</label>
+        <input type="password" name="NuevaContrasena" class="form-control" />
+
+        <label for="ConfirmarContrasena">Confirmar nueva contraseña:</label>
+        <input type="password" name="ConfirmarContrasena" class="form-control" />
+
+        if (usuarioSesion != null && usuarioSesion.Rol == "Administrador")
+        {
+            @Html.LabelFor(m => m.Rol)
+            @Html.DropDownListFor(m => m.Rol,
+                new SelectList(new[] {
+                    new { Value = "Administrador", Text = "Administrador" },
+                    new { Value = "Usuario", Text = "Usuario" }
+                }, "Value", "Text", Model.Rol),
+                "-- Seleccione un rol --",
+                new { @class = "form-control" })
+        }
+
+        <h4>Personalización de Perfil</h4>
+
+        <label for="tema">Tema:</label>
+        @Html.DropDownList("tema", new SelectList(new[] {
+            new { Value = "claro", Text = "Claro" },
+            new { Value = "oscuro", Text = "Oscuro" }
+        }, "Value", "Text", Model.Tema), new { @class = "form-control" })
+
+        <label for="tamañoLetra">Tamaño de Letra:</label>
+        @Html.DropDownList("tamañoLetra", new SelectList(new[] {
+            new { Value = "normal", Text = "Normal" },
+            new { Value = "grande", Text = "Grande" },
+            new { Value = "extra", Text = "Extra Grande" }
+        }, "Value", "Text", Model.TamañoLetra), new { @class = "form-control" })
+
+        <div class="button-container">
+            <button class="button" type="submit">Guardar cambios</button>
+        </div>
+    }
+</div>
