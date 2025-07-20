@@ -1,27 +1,87 @@
-﻿
+﻿@model List<Proyecto1_Paula_Ulate.Models.Usuario>
+
 @{
     ViewBag.Title = "Lista de Usuarios";
+    var usuarioSesion = Session["UsuarioLogueado"] as Proyecto1_Paula_Ulate.Models.Usuario;
 }
 
-<h2>Usuarios Existentes</h2>
-<p>@Html.ActionLink("Crear Nuevo Usuario", "Crear")</p>
+<div class="button-container" style="margin-top: 30px;">
+    @Html.ActionLink("Crear Nuevo Usuario", "Crear", "Usuario", null, new { @class = "button" })
+</div>
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Contraseña</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var usuario in Model)
-        {
+<h2>Usuarios Existentes</h2>
+
+<div id="datoTabla">
+    <table id="tablaUsuarios">
+        <thead>
             <tr>
-                <td>@usuario.Id</td>
-                <td>@usuario.Nombre</td>
-                <td>@usuario.Contraseña</td>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Contraseña</th>
+                <th>Rol</th>
+                <th>Preferencias</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.UsuarioID</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Correo</td>
+                    <td>@item.Contraseña</td>
+                    <td>@item.Rol</td>
+                    <td>@item.Preferencias</td>
+                    <td>
+                        <a href="@Url.Action("Editar", "Usuario", new { id = item.UsuarioID })" class="button" title="Editar">✏️</a>
+                    </td>
+                    <td>
+                        <button class="button btn-eliminar" data-id="@item.UsuarioID" data-nombre="@item.UsuarioID">🗑️</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+<!-- Modal de Confirmación -->
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-contenido">
+        <h3>Confirmar eliminación</h3>
+        <p id="textoModal"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmarEliminar">Eliminar</button>
+            <button class="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let idSeleccionado = "";
+
+        document.querySelectorAll(".btn-eliminar").forEach(btn => {
+            btn.addEventListener("click", function () {
+                idSeleccionado = this.getAttribute("data-id");
+                const nombre = this.getAttribute("data-nombre");
+                document.getElementById("textoModal").textContent = `¿Desea eliminar el usuario "${nombre}"?`;
+                document.getElementById("modalConfirmacion").style.display = "block";
+            });
+        });
+
+        document.getElementById("btnConfirmarEliminar").addEventListener("click", function () {
+            window.location.href = "/Usuario/Eliminar/" + encodeURIComponent(idSeleccionado);
+        });
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
         }
-    </tbody>
-</table>
+    </script>
+}

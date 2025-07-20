@@ -23,11 +23,11 @@
             <table id="tablaRepuestos">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Codigo</th>
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Cantidad Disponible</th>
-                        <th>Precio Unitario</th>
+                        <th>Precio Unitario/$</th>
                         <th>Editar</th>
                         <th>Eliminar</th>
                     </tr>
@@ -36,7 +36,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.Id</td>
+                            <td>@item.Codigo</td>
                             <td>@item.Nombre</td>
                             <td class="descripcion-columna">@item.Descripcion</td>
                             <td>@item.CantidadDisponible</td>

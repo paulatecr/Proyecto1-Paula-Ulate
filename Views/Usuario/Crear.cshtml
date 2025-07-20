@@ -18,11 +18,15 @@
         <label for="Contraseña">Contraseña:</label>
         @Html.PasswordFor(m => m.Contraseña, new { required = "required" })
 
+        <label for="UsuarioID">Usuario:</label>
+        @Html.TextBoxFor(m => m.UsuarioID, new { required = "required" })
+
         @Html.LabelFor(m => m.Rol)
         @Html.DropDownListFor(m => m.Rol,
             new SelectList(new[] {
                 new { Value = "Administrador", Text = "Administrador" },
-                new { Value = "Usuario", Text = "Usuario" }
+                new { Value = "Usuario", Text = "Encargado" },
+                new { Value = "Usuario", Text = "Mecanico" }
             }, "Value", "Text"),
             "-- Seleccione un rol --",
             new { @class = "form-control", required = "required" })

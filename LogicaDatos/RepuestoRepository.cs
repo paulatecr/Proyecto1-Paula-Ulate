@@ -30,6 +30,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                     lista.Add(new Repuesto
                     {
                         Id = Convert.ToInt32(reader["Id"]),
+                        Codigo = reader["Codigo"].ToString(),
                         Nombre = reader["Nombre"].ToString(),
                         Descripcion = reader["Descripcion"].ToString(),
                         CantidadDisponible = Convert.ToInt32(reader["CantidadDisponible"]),
@@ -45,18 +46,31 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = @"
-                    INSERT INTO Repuesto (Nombre, Descripcion, CantidadDisponible, PrecioUnitario)
-                    VALUES (@Nombre, @Descripcion, @CantidadDisponible, @PrecioUnitario)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
-                cmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
-                cmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);
-                cmd.Parameters.AddWithValue("@PrecioUnitario", repuesto.PrecioUnitario);
-
                 conn.Open();
-                cmd.ExecuteNonQuery();
+
+                // 1. Insertar repuesto SIN Código
+                string insertQuery = @"
+            INSERT INTO Repuesto (Nombre, Descripcion, CantidadDisponible, PrecioUnitario)
+            OUTPUT INSERTED.Id
+            VALUES (@Nombre, @Descripcion, @CantidadDisponible, @PrecioUnitario)";
+
+                SqlCommand insertCmd = new SqlCommand(insertQuery, conn);
+                insertCmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
+                insertCmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
+                insertCmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);
+                insertCmd.Parameters.AddWithValue("@PrecioUnitario", repuesto.PrecioUnitario);
+
+                int nuevoId = (int)insertCmd.ExecuteScalar();
+
+                // 2. Generar Código
+                string codigoGenerado = "R-" + nuevoId.ToString("D3");
+
+                // 3. Actualizar con el nuevo Código
+                string updateQuery = "UPDATE Repuesto SET Codigo = @Codigo WHERE Id = @Id";
+                SqlCommand updateCmd = new SqlCommand(updateQuery, conn);
+                updateCmd.Parameters.AddWithValue("@Codigo", codigoGenerado);
+                updateCmd.Parameters.AddWithValue("@Id", nuevoId);
+                updateCmd.ExecuteNonQuery();
             }
         }
 
@@ -77,6 +91,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                     repuesto = new Repuesto
                     {
                         Id = Convert.ToInt32(reader["Id"]),
+                        Codigo = reader["Codigo"].ToString(),
                         Nombre = reader["Nombre"].ToString(),
                         Descripcion = reader["Descripcion"].ToString(),
                         CantidadDisponible = Convert.ToInt32(reader["CantidadDisponible"]),
@@ -102,6 +117,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", repuesto.Id);
+                cmd.Parameters.AddWithValue("@Codigo", repuesto.Codigo);
                 cmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
                 cmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
                 cmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);

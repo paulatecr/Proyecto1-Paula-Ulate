@@ -20,18 +20,28 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                conn.Open();
+
+                // Obtener el siguiente ID
+                string getIdQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM Usuario";
+                SqlCommand getIdCmd = new SqlCommand(getIdQuery, conn);
+                int nextId = (int)getIdCmd.ExecuteScalar();
+
+                string codigoGenerado = "U-" + nextId.ToString("D3");
+
                 string query = @"
-                    INSERT INTO Usuario (Nombre, Correo, Contraseña, Rol)
-                    VALUES (@Nombre, @Correo, @Contraseña, @Rol)";
+            INSERT INTO Usuario (Usuario, Nombre, Correo, Contraseña, Rol, Preferencias, Codigo)
+            VALUES (@Usuario,@Nombre, @Correo, @Contraseña, @Rol, @Preferencias, @Codigo)";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Usuario", usuario.UsuarioID);
                 cmd.Parameters.AddWithValue("@Nombre", usuario.Nombre);
                 cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
                 cmd.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
                 cmd.Parameters.AddWithValue("@Rol", usuario.Rol);
-                cmd.Parameters.AddWithValue("@Preferencias", usuario.Preferencias ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Preferencias", (object)usuario.Preferencias ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Codigo", codigoGenerado);
 
-                conn.Open();
                 cmd.ExecuteNonQuery();
             }
         }
@@ -53,6 +63,8 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                     usuarios.Add(new Usuario
                     {
                         Id = Convert.ToInt32(reader["Id"]),
+                        Codigo = reader["Codigo"].ToString(),
+                        UsuarioID = reader["Usuario"].ToString(),
                         Nombre = reader["Nombre"].ToString(),
                         Correo = reader["Correo"].ToString(),
                         Contraseña = reader["Contraseña"].ToString(),
@@ -83,10 +95,12 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                     usuario = new Usuario
                     {
                         Id = Convert.ToInt32(reader["Id"]),
+                        Codigo = reader["Codigo"].ToString(),
+                        UsuarioID = reader["Usuario"].ToString(),
                         Nombre = reader["Nombre"].ToString(),
                         Correo = reader["Correo"].ToString(),
                         Contraseña = reader["Contraseña"].ToString(),
-                        Rol = reader["Rol"].ToString(),  
+                        Rol = reader["Rol"].ToString(),
                         Preferencias = reader["Preferencias"] != DBNull.Value ? reader["Preferencias"].ToString() : null
                     };
                 }
@@ -101,7 +115,8 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
             {
                 string query = @"
                     UPDATE Usuario
-                    SET Nombre = @Nombre,
+                    SET Usuario = @Usuario,
+                        Nombre = @Nombre,
                         Correo = @Correo,
                         Contraseña = @Contraseña,
                         Rol = @Rol,
@@ -110,6 +125,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", usuario.Id);
+                cmd.Parameters.AddWithValue("@usuario", usuario.UsuarioID);
                 cmd.Parameters.AddWithValue("@Nombre", usuario.Nombre);
                 cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
                 cmd.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
@@ -121,13 +137,13 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
             }
         }
 
-        public void Eliminar(int id)
+        public void Eliminar(string usuarioId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "DELETE FROM Usuario WHERE Id = @Id";
+                string query = "DELETE FROM Usuario WHERE UsuarioID = @UsuarioID";
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", id);
+                cmd.Parameters.AddWithValue("@UsuarioID", usuarioId);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();

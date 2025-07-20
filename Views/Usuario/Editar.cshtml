@@ -17,6 +17,10 @@
     {
         if (usuarioSesion != null && usuarioSesion.Rol == "Administrador")
         {
+            @Html.LabelFor(m => m.UsuarioID)
+            @Html.TextBoxFor(m => m.UsuarioID)
+            @Html.ValidationMessageFor(m => m.UsuarioID)
+
             @Html.LabelFor(m => m.Nombre)
             @Html.TextBoxFor(m => m.Nombre)
             @Html.ValidationMessageFor(m => m.Nombre)
@@ -27,13 +31,29 @@
         }
         else
         {
-            <label>Nombre:</label>
-            <p>@Model.Nombre</p>
-            @Html.HiddenFor(m => m.Nombre)
+            <div class="form-row-inline">
 
-            <label>Correo:</label>
-            <p>@Model.Correo</p>
-            @Html.HiddenFor(m => m.Correo)
+                <label>Usuario:</label>
+                <p>@Model.UsuarioID</p>
+            </div>
+
+            @Html.HiddenFor(m => m.UsuarioID)
+
+            <div class="form-row-inline">
+
+                <label>Nombre:</label>
+                <p>@Model.Nombre</p>
+            </div>
+
+            @Html.HiddenFor(m => m.Nombre)
+    
+            <div class="form-row-inline">
+                <label>Correo:</label>
+                <p>@Model.Correo</p>
+               </div>
+                @Html.HiddenFor(m => m.Correo)
+
+            
         }
 
         <h4>Cambiar contraseña</h4>

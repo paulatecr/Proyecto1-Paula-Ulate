@@ -26,7 +26,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
         {
             var repo = new UsuarioRepository(ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString);
             var usuarios = repo.ObtenerTodos();
-            var user = usuarios.FirstOrDefault(u => u.Nombre == usuario && u.Contraseña == contrasena);
+            var user = usuarios.FirstOrDefault(u => u.UsuarioID == usuario && u.Contraseña == contrasena);
 
             if (user != null)
             {

@@ -80,11 +80,13 @@ namespace Proyecto1_Paula_Ulate.Controllers
             if (original == null)
                 return RedirectToAction("Index", "Home");
 
+            // Asegurar ID
             usuario.Id = original.Id;
 
-            // Solo el administrador puede cambiar nombre/correo/rol
+            // Solo el administrador puede cambiar nombre/correo/usuarioID/rol
             if (original.Rol != "Administrador")
             {
+                usuario.UsuarioID = original.UsuarioID;
                 usuario.Nombre = original.Nombre;
                 usuario.Correo = original.Correo;
                 usuario.Rol = original.Rol;
@@ -112,9 +114,10 @@ namespace Proyecto1_Paula_Ulate.Controllers
             // Leer preferencias del formulario
             string tema = Request.Form["tema"];
             string tamañoLetra = Request.Form["tamañoLetra"];
-            var preferencias = new { tema, tamañoLetra = tamañoLetra };
+            var preferencias = new { tema, tamañoLetra };
             usuario.Preferencias = JsonConvert.SerializeObject(preferencias);
 
+            // Guardar cambios
             repositorio.Actualizar(usuario);
 
             // Actualizar sesión
@@ -122,6 +125,15 @@ namespace Proyecto1_Paula_Ulate.Controllers
 
             ViewBag.Mensaje = "Perfil actualizado correctamente.";
             return View(usuario);
+        }
+
+        public ActionResult Eliminar(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return RedirectToAction("Index");
+
+            repositorio.Eliminar(id);
+            return RedirectToAction("Index");
         }
     }
 }
