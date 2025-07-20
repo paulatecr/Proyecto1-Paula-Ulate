@@ -58,6 +58,18 @@ namespace Proyecto1_Paula_Ulate.Controllers
             if (user == null)
                 return RedirectToAction("Index", "Home");
 
+            // Deserializar preferencias si existen
+            if (!string.IsNullOrEmpty(user.Preferencias))
+            {
+                try
+                {
+                    dynamic prefs = JsonConvert.DeserializeObject(user.Preferencias);
+                    user.Tema = prefs.tema;
+                    user.TamañoLetra = prefs.tamañoLetra;
+                }
+                catch { }
+            }
+
             return View(user);
         }
 
@@ -70,7 +82,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
 
             usuario.Id = original.Id;
 
-            // Solo los administradores pueden cambiar nombre/correo
+            // Solo el administrador puede cambiar nombre/correo/rol
             if (original.Rol != "Administrador")
             {
                 usuario.Nombre = original.Nombre;
@@ -78,18 +90,18 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 usuario.Rol = original.Rol;
             }
 
-            // Contraseña
-            string nueva = Request.Form["NuevaContraseña"];
-            string confirmar = Request.Form["ConfirmarContraseña"];
+            // Validar y actualizar contraseña
+            string nueva = Request.Form["NuevaContrasena"];
+            string confirmar = Request.Form["ConfirmarContrasena"];
 
             if (!string.IsNullOrWhiteSpace(nueva))
             {
                 if (nueva != confirmar)
                 {
-                    ViewBag.ErrorContraseña = "Las contraseñas no coinciden.";
+                    ViewBag.ErrorContrasena = "Las contraseñas no coinciden.";
+                    usuario.Contraseña = original.Contraseña;
                     return View(usuario);
                 }
-
                 usuario.Contraseña = nueva;
             }
             else
@@ -97,16 +109,18 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 usuario.Contraseña = original.Contraseña;
             }
 
-            // Preferencias
-            var tema = Request.Form["tema"];
-            var tamañoLetra = Request.Form["tamañoLetra"];
-            var preferencias = new { tema, tamañoLetra };
+            // Leer preferencias del formulario
+            string tema = Request.Form["tema"];
+            string tamañoLetra = Request.Form["tamañoLetra"];
+            var preferencias = new { tema, tamañoLetra = tamañoLetra };
             usuario.Preferencias = JsonConvert.SerializeObject(preferencias);
 
             repositorio.Actualizar(usuario);
-            Session["UsuarioLogueado"] = usuario;
-            ViewBag.Mensaje = "Perfil actualizado correctamente.";
 
+            // Actualizar sesión
+            Session["UsuarioLogueado"] = usuario;
+
+            ViewBag.Mensaje = "Perfil actualizado correctamente.";
             return View(usuario);
         }
     }

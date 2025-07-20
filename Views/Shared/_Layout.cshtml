@@ -11,50 +11,52 @@
 
     @{
         var user = Session["UsuarioLogueado"] as Proyecto1_Paula_Ulate.Models.Usuario;
+        var tema = user != null ? user.Tema : "claro";
+        var tamanioLetra = user != null ? user.TamañoLetra : "normal";
     }
 </head>
-<body class="@((user != null) ? user.Tema + " letra-" + user.TamañoLetra : "")">
+    <body class="@tema @tamanioLetra">
 
-        <header>
-            <nav class="navbar">
-                <div class="navbar-container">
-                    <span class="titulo-navbar">Proyecto 1 - Paula Ulate</span>
+    <header>
+        <nav class="navbar">
+            <div class="navbar-container">
+                <span class="titulo-navbar">Proyecto 1 - Paula Ulate</span>
 
-                    <ul class="menu-navbar">
-                        @if (user == null)
+                <ul class="menu-navbar">
+                    @if (user == null)
+                    {
+                        <li>@Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Contacto", "Contact", "Home", null, new { @class = "nav-link" })</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
+
+                        if (user.Rol == "Administrador")
                         {
-                            <li>@Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Contacto", "Contact", "Home", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Usuarios Existentes", "Index", "Usuario", null, new { @class = "nav-link" })</li>
                         }
-                        else
-                        {
-                            <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
 
-                            if (user.Rol == "Administrador")
-                            {
-                                <li>@Html.ActionLink("Usuarios Existentes", "Index", "Usuario", null, new { @class = "nav-link" })</li>
-                            }
+                        <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
+                    }
+                </ul>
+            </div>
+        </nav>
+    </header>
 
-                            <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
-                        }
-                    </ul>
-                </div>
-            </nav>
-        </header>
+    <div class="container mt-4">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Proyecto 1 - Paula Ulate</p>
+        </footer>
+    </div>
 
-        <div class="container mt-4">
-            @RenderBody()
-            <hr />
-            <footer>
-                <p>&copy; @DateTime.Now.Year - Proyecto 1 - Paula Ulate</p>
-            </footer>
-        </div>
-
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
-    </body>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
 </html>

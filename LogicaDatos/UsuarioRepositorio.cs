@@ -29,6 +29,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                 cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
                 cmd.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
                 cmd.Parameters.AddWithValue("@Rol", usuario.Rol);
+                cmd.Parameters.AddWithValue("@Preferencias", usuario.Preferencias ?? (object)DBNull.Value);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -55,7 +56,8 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                         Nombre = reader["Nombre"].ToString(),
                         Correo = reader["Correo"].ToString(),
                         Contraseña = reader["Contraseña"].ToString(),
-                        Rol = reader["Rol"].ToString()
+                        Rol = reader["Rol"].ToString(),
+                        Preferencias = reader["Preferencias"] != DBNull.Value ? reader["Preferencias"].ToString() : null
                     });
                 }
             }
@@ -84,7 +86,8 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                         Nombre = reader["Nombre"].ToString(),
                         Correo = reader["Correo"].ToString(),
                         Contraseña = reader["Contraseña"].ToString(),
-                        Rol = reader["Rol"].ToString()
+                        Rol = reader["Rol"].ToString(),  
+                        Preferencias = reader["Preferencias"] != DBNull.Value ? reader["Preferencias"].ToString() : null
                     };
                 }
             }
@@ -101,7 +104,8 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                     SET Nombre = @Nombre,
                         Correo = @Correo,
                         Contraseña = @Contraseña,
-                        Rol = @Rol
+                        Rol = @Rol,
+                        [Preferencias] = @Preferencias
                     WHERE Id = @Id";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -110,6 +114,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                 cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
                 cmd.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
                 cmd.Parameters.AddWithValue("@Rol", usuario.Rol);
+                cmd.Parameters.AddWithValue("@Preferencias", usuario.Preferencias);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();

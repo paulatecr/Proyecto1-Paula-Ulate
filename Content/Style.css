@@ -147,21 +147,88 @@ td {
     white-space: normal;
 }
 
-/* Tema oscuro */
-.oscuro {
-    background-color: #1e1e2f;
+
+/* Tema claro */
+body.claro {
+    background-color: #ffffff;
     color: black;
 }
 
-/* Tamaños de letra */
-.letra-normal {
+/* Tema oscuro */
+body.oscuro {
+    background-color: #121212;
+    color: white;
+}
+
+    body.oscuro .form-container {
+        background-color: #2b2b2b; 
+        color: white;
+        border-color: #7e57c2; 
+    }
+
+        body.oscuro .form-container label {
+            color: white;
+        }
+
+        body.oscuro .form-container h1,
+        body.oscuro .form-container h4 {
+            color: #CE93D8; 
+            border-color: #CE93D8;
+            text-shadow: none;
+        }
+
+    body.oscuro input,
+    body.oscuro select {
+        background-color: #1e1e1e;
+        color: white;
+        border: 1px solid #888;
+    }
+
+    body.oscuro table {
+        border-color: #7e57c2;
+    }
+
+    body.oscuro th {
+        background-color: #2b2b2b; 
+        color: white;
+    }
+
+    body.oscuro td {
+        color: white;
+    }
+
+    body.oscuro .nav-link {
+        color: #ffffff;
+    }
+
+body.normal {
     font-size: 16px;
 }
 
-.letra-grande {
-    font-size: 20px;
+body.grande,
+body.grande input,
+body.grande select,
+body.grande button,
+body.grande label,
+body.grande h1,
+body.grande h2,
+body.grande h3,
+body.grande h4,
+body.grande th,
+body.grande td {
+    font-size: 22px;
 }
 
-.letra-extra {
-    font-size: 24px;
+body.extra,
+body.extra input,
+body.extra select,
+body.extra button,
+body.extra label,
+body.extra h1,
+body.extra h2,
+body.extra h3,
+body.extra h4,
+body.extra th,
+body.extra td {
+    font-size: 28px;
 }
