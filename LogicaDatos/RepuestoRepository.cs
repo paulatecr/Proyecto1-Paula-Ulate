@@ -1,141 +1,128 @@
 ﻿using Proyecto1_Paula_Ulate.Models;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 namespace Proyecto1_Paula_Ulate.LogicaDatos
 {
     public class RepuestoRepository
     {
-        private readonly string connectionString;
+        private readonly string _connectionString;
 
-        public RepuestoRepository()
+        public RepuestoRepository(string connectionString)
         {
-            connectionString = ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString;
-        }
-
-        public void Insertar(Repuesto repuesto)
-        {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = @"INSERT INTO Repuestos (Nombre, Descripcion, CantidadDisponible, PrecioUnitario)
-                                 VALUES (@Nombre, @Descripcion, @CantidadDisponible, @PrecioUnitario)";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
-                    cmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
-                    cmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);
-                    cmd.Parameters.AddWithValue("@PrecioUnitario", repuesto.PrecioUnitario);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public void Actualizar(Repuesto repuesto)
-        {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = @"UPDATE Repuestos 
-                                 SET Nombre = @Nombre, Descripcion = @Descripcion, CantidadDisponible = @CantidadDisponible, PrecioUnitario = @PrecioUnitario
-                                 WHERE Id = @Id";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
-                    cmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
-                    cmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);
-                    cmd.Parameters.AddWithValue("@PrecioUnitario", repuesto.PrecioUnitario);
-                    cmd.Parameters.AddWithValue("@Id", repuesto.Id);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public void Eliminar(int id)
-        {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = "DELETE FROM Repuestos WHERE Id = @Id";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Id", id);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            _connectionString = connectionString;
         }
 
         public List<Repuesto> ObtenerTodos()
         {
             var lista = new List<Repuesto>();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT Id, Nombre, Descripcion, CantidadDisponible, PrecioUnitario FROM Repuestos";
+                string query = "SELECT * FROM Repuesto";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    conn.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    lista.Add(new Repuesto
                     {
-                        while (reader.Read())
-                        {
-                            var repuesto = new Repuesto
-                            {
-                                Id = reader.GetInt32(0),
-                                Nombre = reader.GetString(1),
-                                Descripcion = reader.GetString(2),
-                                CantidadDisponible = reader.GetInt32(3),
-                                PrecioUnitario = reader.GetDecimal(4)
-                            };
-                            lista.Add(repuesto);
-                        }
-                    }
+                        Id = Convert.ToInt32(reader["Id"]),
+                        Nombre = reader["Nombre"].ToString(),
+                        Descripcion = reader["Descripcion"].ToString(),
+                        CantidadDisponible = Convert.ToInt32(reader["CantidadDisponible"]),
+                        PrecioUnitario = Convert.ToDecimal(reader["PrecioUnitario"])
+                    });
                 }
             }
+
             return lista;
         }
 
-        public Repuesto BuscarPorId(int id)
+        public void Insertar(Repuesto repuesto)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    INSERT INTO Repuesto (Nombre, Descripcion, CantidadDisponible, PrecioUnitario)
+                    VALUES (@Nombre, @Descripcion, @CantidadDisponible, @PrecioUnitario)";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
+                cmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
+                cmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);
+                cmd.Parameters.AddWithValue("@PrecioUnitario", repuesto.PrecioUnitario);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public Repuesto ObtenerPorId(int id)
         {
             Repuesto repuesto = null;
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT Id, Nombre, Descripcion, CantidadDisponible, PrecioUnitario FROM Repuestos WHERE Id = @Id";
+                string query = "SELECT * FROM Repuesto WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Id", id);
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-
-                    conn.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    repuesto = new Repuesto
                     {
-                        if (reader.Read())
-                        {
-                            repuesto = new Repuesto
-                            {
-                                Id = reader.GetInt32(0),
-                                Nombre = reader.GetString(1),
-                                Descripcion = reader.GetString(2),
-                                CantidadDisponible = reader.GetInt32(3),
-                                PrecioUnitario = reader.GetDecimal(4)
-                            };
-                        }
-                    }
+                        Id = Convert.ToInt32(reader["Id"]),
+                        Nombre = reader["Nombre"].ToString(),
+                        Descripcion = reader["Descripcion"].ToString(),
+                        CantidadDisponible = Convert.ToInt32(reader["CantidadDisponible"]),
+                        PrecioUnitario = Convert.ToDecimal(reader["PrecioUnitario"])
+                    };
                 }
             }
+
             return repuesto;
+        }
+
+        public void Actualizar(Repuesto repuesto)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    UPDATE Repuesto
+                    SET Nombre = @Nombre,
+                        Descripcion = @Descripcion,
+                        CantidadDisponible = @CantidadDisponible,
+                        PrecioUnitario = @PrecioUnitario
+                    WHERE Id = @Id";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Id", repuesto.Id);
+                cmd.Parameters.AddWithValue("@Nombre", repuesto.Nombre);
+                cmd.Parameters.AddWithValue("@Descripcion", repuesto.Descripcion);
+                cmd.Parameters.AddWithValue("@CantidadDisponible", repuesto.CantidadDisponible);
+                cmd.Parameters.AddWithValue("@PrecioUnitario", repuesto.PrecioUnitario);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void Eliminar(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM Repuesto WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Id", id);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 }

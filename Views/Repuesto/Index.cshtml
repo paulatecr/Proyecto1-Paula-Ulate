@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "Lista de Repuestos";
+}
+
+@model List<Proyecto1_Paula_Ulate.Models.Repuesto>
+
+@{
+    ViewBag.Title = "Lista de Repuestos";
+}
+
+<div class="form-container">
+    <h1>Lista de Repuestos</h1>
+
+    <div style="margin: 20px auto; text-align: center;">
+        <label for="busqueda">Buscar por ID o Nombre:</label>
+        <input type="text" id="busqueda" placeholder="Ingrese texto para filtrar" style="width: 80%;" />
+    </div>
+</div>
+    @if (Model != null && Model.Any())
+    {
+        <div id="datoTabla">
+            <table id="tablaRepuestos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Cantidad Disponible</th>
+                        <th>Precio Unitario</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Nombre</td>
+                            <td class="descripcion-columna">@item.Descripcion</td>
+                            <td>@item.CantidadDisponible</td>
+                            <td>@item.PrecioUnitario.ToString("C")</td>
+                            <td>
+                                <a href="@Url.Action("Editar", "Repuesto", new { id = item.Id })" class="button" title="Editar">✏️</a>
+                            </td>
+                            <td>
+                                <button class="button btn-eliminar" data-id="@item.Id" data-nombre="@item.Nombre">🗑️</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No hay repuestos registrados.</p>
+    }
+
+
+<div class="button-container" style="margin-top: 30px;">
+    @Html.ActionLink("Agregar Nuevo Repuesto", "Crear", "Repuesto", null, new { @class = "button" })
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-contenido">
+        <h3>Confirmar eliminación</h3>
+        <p id="textoModal"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmarEliminar">Eliminar</button>
+            <button class="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let idSeleccionado = 0;
+
+        document.querySelectorAll(".btn-eliminar").forEach(btn => {
+            btn.addEventListener("click", function () {
+                idSeleccionado = this.getAttribute("data-id");
+                const nombre = this.getAttribute("data-nombre");
+                document.getElementById("textoModal").textContent = `¿Desea eliminar el repuesto "${nombre}"?`;
+                document.getElementById("modalConfirmacion").style.display = "block";
+            });
+        });
+
+        document.getElementById("btnConfirmarEliminar").addEventListener("click", function () {
+            window.location.href = "/Repuesto/Eliminar/" + idSeleccionado;
+        });
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        }
+
+        document.getElementById("busqueda").addEventListener("keyup", function () {
+            var texto = this.value.toLowerCase();
+            var filas = document.querySelectorAll("#tablaRepuestos tbody tr");
+
+            filas.forEach(function (fila) {
+                var id = fila.cells[0].textContent.toLowerCase();
+                var nombre = fila.cells[1].textContent.toLowerCase();
+
+                fila.style.display = (id.includes(texto) || nombre.includes(texto)) ? "" : "none";
+            });
+        });
+    </script>
+}

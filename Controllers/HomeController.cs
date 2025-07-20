@@ -24,7 +24,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
         [HttpPost]
         public ActionResult Login(string usuario, string contrasena)
         {
-            var repo = new UsuarioRepositorio(ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString);
+            var repo = new UsuarioRepository(ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString);
             var usuarios = repo.ObtenerTodos();
             var user = usuarios.FirstOrDefault(u => u.Nombre == usuario && u.Contraseña == contrasena);
 

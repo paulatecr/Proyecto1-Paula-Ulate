@@ -9,7 +9,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
 {
     public class UsuarioController : Controller
     {
-        private readonly UsuarioRepositorio repositorio;
+        private readonly UsuarioRepository repositorio;
 
         public UsuarioController()
         {
@@ -17,7 +17,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 .ConnectionStrings["ConexionBaseDatos"]
                 .ConnectionString;
 
-            repositorio = new UsuarioRepositorio(connectionString);
+            repositorio = new UsuarioRepository(connectionString);
         }
 
         public ActionResult Index()

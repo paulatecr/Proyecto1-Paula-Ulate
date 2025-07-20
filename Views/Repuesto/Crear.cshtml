@@ -1,0 +1,33 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Repuesto
+
+@{
+    ViewBag.Title = "Crear Repuesto";
+}
+
+<div class="form-container">
+    <h1>Registrar Nuevo Repuesto</h1>
+
+    @using (Html.BeginForm())
+    {
+        @Html.LabelFor(m => m.Nombre)
+        @Html.TextBoxFor(m => m.Nombre, new { required = "required" })
+        @Html.ValidationMessageFor(m => m.Nombre)
+
+        @Html.LabelFor(m => m.Descripcion)
+        @Html.TextAreaFor(m => m.Descripcion, new { required = "required", rows = 3 })
+        @Html.ValidationMessageFor(m => m.Descripcion)
+
+        @Html.LabelFor(m => m.CantidadDisponible)
+        @Html.TextBoxFor(m => m.CantidadDisponible, new { type = "number", min = "0", required = "required" })
+        @Html.ValidationMessageFor(m => m.CantidadDisponible)
+
+        @Html.LabelFor(m => m.PrecioUnitario)
+        @Html.TextBoxFor(m => m.PrecioUnitario, new { type = "number", step = "0.01", min = "0", required = "required" })
+        @Html.ValidationMessageFor(m => m.PrecioUnitario)
+
+        <div class="button-container">
+            <button type="submit" class="button">Guardar Repuesto</button>
+        </div>
+    }
+</div>
+

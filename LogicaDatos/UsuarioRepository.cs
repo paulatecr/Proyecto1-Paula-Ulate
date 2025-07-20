@@ -7,11 +7,11 @@ using System.Web;
 
 namespace Proyecto1_Paula_Ulate.LogicaDatos
 {
-    public class UsuarioRepositorio
+    public class UsuarioRepository
     {
         private readonly string _connectionString;
 
-        public UsuarioRepositorio(string connectionString)
+        public UsuarioRepository(string connectionString)
         {
             _connectionString = connectionString;
         }

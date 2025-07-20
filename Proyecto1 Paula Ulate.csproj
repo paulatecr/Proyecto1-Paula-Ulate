@@ -132,7 +132,7 @@
     <Compile Include="LogicaDatos\EntregaRepository.cs" />
     <Compile Include="LogicaDatos\RepuestoRepository.cs" />
     <Compile Include="LogicaDatos\SolicitudRepository.cs" />
-    <Compile Include="LogicaDatos\UsuarioRepositorio.cs" />
+    <Compile Include="LogicaDatos\UsuarioRepository.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Models\Entrega.cs" />
     <Compile Include="Models\Repuesto.cs" />
@@ -194,11 +194,13 @@
     <Content Include="Views\Usuario\Crear.cshtml" />
     <Content Include="Views\Usuario\Editar.cshtml" />
     <Content Include="Views\Usuario\Perfil.cshtml" />
+    <Content Include="Views\Repuesto\Crear.cshtml" />
+    <Content Include="Views\Repuesto\Index.cshtml" />
+    <Content Include="Views\Repuesto\Editar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Entrega\" />
-    <Folder Include="Views\Repuesto\" />
     <Folder Include="Views\Solicitud\" />
   </ItemGroup>
   <ItemGroup>
