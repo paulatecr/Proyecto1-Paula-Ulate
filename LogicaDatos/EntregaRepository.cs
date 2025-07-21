@@ -88,5 +88,66 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
 
             return lista;
         }
+
+        public List<Entrega> ObtenerTodos()
+        {
+            var lista = new List<Entrega>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT 
+                E.Id, E.Codigo, E.FechaEntrega, E.EntregadoPor, E.Observaciones, 
+                E.RecibidoPor, E.CantidadEntregada, 
+                S.Id AS SolicitudId, S.Codigo AS SolicitudCodigo, S.CantidadSolicitada, 
+                R.Id AS RepuestoId, R.Codigo AS RepuestoCodigo, R.Nombre AS RepuestoNombre
+            FROM Entrega E
+            INNER JOIN Solicitud S ON E.SolicitudId = S.Id
+            INNER JOIN Repuesto R ON S.RepuestoId = R.Id
+        ";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var repuesto = new Repuesto
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("RepuestoId")),
+                                Codigo = reader.GetString(reader.GetOrdinal("RepuestoCodigo")),
+                                Nombre = reader.GetString(reader.GetOrdinal("RepuestoNombre"))
+                            };
+
+                            var solicitud = new Solicitud
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("SolicitudId")),
+                                Codigo = reader.GetString(reader.GetOrdinal("SolicitudCodigo")),
+                                CantidadSolicitada = reader.GetInt32(reader.GetOrdinal("CantidadSolicitada")),
+                                Repuesto = repuesto
+                            };
+
+                            var entrega = new Entrega
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Codigo = reader.IsDBNull(reader.GetOrdinal("Codigo")) ? "" : reader.GetString(reader.GetOrdinal("Codigo")),
+                                FechaEntrega = reader.GetDateTime(reader.GetOrdinal("FechaEntrega")),
+                                EntregadoPor = reader.GetString(reader.GetOrdinal("EntregadoPor")),
+                                Observaciones = reader.IsDBNull(reader.GetOrdinal("Observaciones")) ? "" : reader.GetString(reader.GetOrdinal("Observaciones")),
+                                RecibidoPor = reader.GetString(reader.GetOrdinal("RecibidoPor")),
+                                CantidadEntregada = reader.GetInt32(reader.GetOrdinal("CantidadEntregada")),
+                                SolicitudId = solicitud.Id,
+                                Solicitud = solicitud
+                            };
+
+                            lista.Add(entrega);
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
     }
 }

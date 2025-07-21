@@ -17,6 +17,7 @@
         @Html.HiddenFor(m => m.SolicitudId)
         @Html.Hidden("CantidadSolicitada", solicitud.CantidadSolicitada)
         @Html.Hidden("CantidadDisponible", repuesto.CantidadDisponible)
+        @Html.Hidden("CantidadPendiente", cantidadPendiente)
         @Html.HiddenFor(m => m.EntregadoPor)
         @Html.HiddenFor(m => m.FechaEntrega)
 
@@ -81,8 +82,9 @@
         document.getElementById("btnEnviar").addEventListener("click", function (e) {
             var cantidad = parseInt(document.getElementById("CantidadEntregada").value);
             var disponible = parseInt(document.getElementById("disponible").innerText);
+            var pendiente = parseInt(document.getElementById("CantidadPendiente").value);
 
-            if (cantidad > disponible) {
+            if (cantidad > disponible || cantidad > pendiente) {
                 e.preventDefault();
                 document.getElementById("modalConfirmacion").style.display = "block";
             }

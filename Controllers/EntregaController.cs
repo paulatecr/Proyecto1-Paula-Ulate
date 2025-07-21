@@ -104,5 +104,22 @@ namespace Proyecto1_Paula_Ulate.Controllers
             TempData["Mensaje"] = "Entrega registrada correctamente.";
             return RedirectToAction("Index", "Solicitud");
         }
+
+        public ActionResult Index(string filtro)
+        {
+            var entregas = entregaRepo.ObtenerTodos();
+
+            if (!string.IsNullOrEmpty(filtro))
+            {
+                filtro = filtro.ToLower();
+                entregas = entregas.Where(e =>
+                    (e.Solicitud?.Codigo?.ToLower().Contains(filtro) ?? false) ||
+                    (e.Solicitud?.Repuesto?.Codigo?.ToLower().Contains(filtro) ?? false) ||
+                    (e.Solicitud?.Repuesto?.Nombre?.ToLower().Contains(filtro) ?? false)
+                ).ToList();
+            }
+
+            return View(entregas);
+        }
     }
 }

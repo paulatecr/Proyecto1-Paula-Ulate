@@ -203,6 +203,7 @@
     <Content Include="Views\Solicitud\Editar.cshtml" />
     <Content Include="Views\Solicitud\CrearDesdeBoton.cshtml" />
     <Content Include="Views\Entrega\Crear.cshtml" />
+    <Content Include="Views\Entrega\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

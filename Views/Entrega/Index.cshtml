@@ -1,0 +1,64 @@
+﻿@model List<Proyecto1_Paula_Ulate.Models.Entrega>
+@{
+    ViewBag.Title = "Listado de Entregas";
+}
+
+<h1 class="h1-Index">Listado de Entregas</h1>
+
+<div class="form-container">
+
+
+    <form method="get" action="@Url.Action("Index")" style="margin-bottom: 20px;">
+        <input input type="text" id="busqueda" placeholder="Buscar por Solicitud o Repuesto" class="form-control" />
+        <button type="submit" class="button" style="margin-top: 5px;">Buscar</button>
+    </form>
+</div>
+
+<table class="table" id="tablaEntregas">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Solicitud</th>
+            <th>Repuesto</th>
+            <th>Cantidad Entregada</th>
+            <th>Fecha</th>
+            <th>Recibido Por</th>
+            <th>Observaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entrega in Model)
+        {
+            <tr>
+                <td>@entrega.Codigo</td>
+                <td>@entrega.Solicitud.Codigo</td>
+                <td>@(entrega.Solicitud?.Repuesto?.Codigo) - @(entrega.Solicitud?.Repuesto?.Nombre)</td>
+                <td>@entrega.CantidadEntregada</td>
+                <td>@entrega.FechaEntrega.ToString("dd/MM/yyyy")</td>
+                <td>@entrega.RecibidoPor</td>
+                <td>@entrega.Observaciones</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <script>
+    document.getElementById("busqueda").addEventListener("keyup", function () {
+        const texto = this.value.toLowerCase();
+        const filas = document.querySelectorAll("#tablaEntregas tbody tr");
+
+        filas.forEach(fila => {
+            const codigoEntrega = fila.cells[0].textContent.toLowerCase();
+            const codigoSolicitud = fila.cells[1].textContent.toLowerCase();
+            const repuesto = fila.cells[2].textContent.toLowerCase();
+
+            const coincide = codigoEntrega.includes(texto) ||
+                             codigoSolicitud.includes(texto) ||
+                             repuesto.includes(texto);
+
+            fila.style.display = coincide ? "" : "none";
+        });
+    });
+    </script>
+}
