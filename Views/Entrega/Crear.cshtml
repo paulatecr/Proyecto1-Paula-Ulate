@@ -1,0 +1,95 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Entrega
+@using Proyecto1_Paula_Ulate.Models
+
+@{
+    ViewBag.Title = "Registrar Entrega";
+    var repuesto = ViewBag.Repuesto as Repuesto;
+    var solicitud = ViewBag.Solicitud as Solicitud;
+    int cantidadPendiente = ViewBag.CantidadPendiente != null ? (int)ViewBag.CantidadPendiente : 0;
+}
+
+<div class="form-container">
+    <h1>Registrar Entrega</h1>
+
+    @using (Html.BeginForm("Crear", "Entrega", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.SolicitudId)
+        @Html.Hidden("CantidadSolicitada", solicitud.CantidadSolicitada)
+        @Html.Hidden("CantidadDisponible", repuesto.CantidadDisponible)
+        @Html.HiddenFor(m => m.EntregadoPor)
+        @Html.HiddenFor(m => m.FechaEntrega)
+
+        <div class="form-group">
+            <label>Solicitud:</label>
+            <p>@solicitud.Codigo - @solicitud.Solicitante</p>
+        </div>
+
+        <div class="form-group">
+            <label>Repuesto:</label>
+            <p>@repuesto.Codigo - @repuesto.Nombre</p>
+        </div>
+
+        <div class="form-group">
+            <label>Cantidad Solicitada:</label>
+            <p id="solicitada">@solicitud.CantidadSolicitada</p>
+        </div>
+
+        <div class="form-group">
+            <label>Cantidad Disponible:</label>
+            <p id="disponible">@repuesto.CantidadDisponible</p>
+        </div>
+
+        <div class="form-group">
+            <label>Cantidad Pendiente:</label>
+            <p id="cantidadPendienteTexto">@cantidadPendiente</p>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Cantidad a Entregar:")
+            @Html.TextBox("CantidadEntregada", null, new { type = "number", min = 1, required = "required", @class = "form-control", id = "CantidadEntregada" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.RecibidoPor)
+            @Html.TextBoxFor(m => m.RecibidoPor, new { @class = "form-control", required = "required" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Observaciones)
+            @Html.TextAreaFor(m => m.Observaciones, new { @class = "form-control", rows = 3 })
+        </div>
+
+        <button type="submit" class="button" id="btnEnviar">Registrar Entrega</button>
+        <a href="@Url.Action("Index", "Solicitud")" class="button">Cancelar</a>
+    }
+</div>
+
+<!-- Modal de Advertencia -->
+<div id="modalConfirmacion" class="modal" style="display: none;">
+    <div class="modal-contenido">
+        <h3>Atención</h3>
+        <p>La cantidad entregada excede lo disponible. No se puede entregar más de lo que hay en bodega.</p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmar">Corregir</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        document.getElementById("btnEnviar").addEventListener("click", function (e) {
+            var cantidad = parseInt(document.getElementById("CantidadEntregada").value);
+            var disponible = parseInt(document.getElementById("disponible").innerText);
+
+            if (cantidad > disponible) {
+                e.preventDefault();
+                document.getElementById("modalConfirmacion").style.display = "block";
+            }
+        });
+
+        document.getElementById("btnConfirmar").addEventListener("click", function () {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        });
+    </script>
+}

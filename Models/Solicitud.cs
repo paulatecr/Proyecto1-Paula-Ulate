@@ -22,6 +22,8 @@ namespace Proyecto1_Paula_Ulate.Models
 
         public int CantidadSolicitada { get; set; }
 
+        public List<Entrega> Entregas { get; set; }
+
         public string Estado { get; set; }
     }
 }

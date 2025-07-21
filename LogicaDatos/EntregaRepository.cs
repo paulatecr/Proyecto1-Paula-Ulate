@@ -1,137 +1,92 @@
-﻿using Proyecto1_Paula_Ulate.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
+using Proyecto1_Paula_Ulate.Models;
 
 namespace Proyecto1_Paula_Ulate.LogicaDatos
 {
     public class EntregaRepository
     {
-        private readonly string _connectionString;
+        private readonly string connectionString;
 
-        public EntregaRepository(string connectionString)
+        public EntregaRepository()
         {
-            _connectionString = connectionString;
+            connectionString = ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString;
         }
 
         public void Insertar(Entrega entrega)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"
-                    INSERT INTO Entrega (FechaEntrega, EntregadoPor, SolicitudId, Observaciones, RecibidoPor)
-                    VALUES (@FechaEntrega, @EntregadoPor, @SolicitudId, @Observaciones, @RecibidoPor)";
+                string insertQuery = @"
+                    INSERT INTO Entrega (FechaEntrega, EntregadoPor, SolicitudId, Observaciones, RecibidoPor, CantidadEntregada)
+                    VALUES (@FechaEntrega, @EntregadoPor, @SolicitudId, @Observaciones, @RecibidoPor, @CantidadEntregada);
+                    SELECT SCOPE_IDENTITY();";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@FechaEntrega", entrega.FechaEntrega);
-                cmd.Parameters.AddWithValue("@EntregadoPor", entrega.EntregadoPor);
-                cmd.Parameters.AddWithValue("@SolicitudId", entrega.SolicitudId);
-                cmd.Parameters.AddWithValue("@Observaciones", entrega.Observaciones ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@RecibidoPor", entrega.RecibidoPor);
+                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@FechaEntrega", entrega.FechaEntrega);
+                    cmd.Parameters.AddWithValue("@EntregadoPor", entrega.EntregadoPor);
+                    cmd.Parameters.AddWithValue("@SolicitudId", entrega.SolicitudId);
+                    cmd.Parameters.AddWithValue("@Observaciones", entrega.Observaciones ?? "");
+                    cmd.Parameters.AddWithValue("@RecibidoPor", entrega.RecibidoPor ?? "");
+                    cmd.Parameters.AddWithValue("@CantidadEntregada", entrega.CantidadEntregada);
 
-                conn.Open();
-                cmd.ExecuteNonQuery();
+                    conn.Open();
+                    int nuevoId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    string codigo = "E-" + nuevoId.ToString("D3");
+
+                    string updateCodigo = "UPDATE Entrega SET Codigo = @Codigo WHERE Id = @Id";
+                    cmd.CommandText = updateCodigo;
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@Codigo", codigo);
+                    cmd.Parameters.AddWithValue("@Id", nuevoId);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
-        public List<Entrega> ObtenerTodas()
+        public List<Entrega> ObtenerPorSolicitudId(int solicitudId)
         {
-            List<Entrega> entregas = new List<Entrega>();
+            var lista = new List<Entrega>();
 
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT * FROM Entrega";
-                SqlCommand cmd = new SqlCommand(query, conn);
+                string query = @"
+            SELECT Id, Codigo, FechaEntrega, EntregadoPor, Observaciones, RecibidoPor, CantidadEntregada
+            FROM Entrega
+            WHERE SolicitudId = @SolicitudId";
 
-                conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    entregas.Add(new Entrega
+                    cmd.Parameters.AddWithValue("@SolicitudId", solicitudId);
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        Id = Convert.ToInt32(reader["Id"]),
-                        FechaEntrega = Convert.ToDateTime(reader["FechaEntrega"]),
-                        EntregadoPor = reader["EntregadoPor"].ToString(),
-                        SolicitudId = Convert.ToInt32(reader["SolicitudId"]),
-                        Observaciones = reader["Observaciones"] != DBNull.Value ? reader["Observaciones"].ToString() : null,
-                        RecibidoPor = reader["RecibidoPor"].ToString()
-                    });
+                        while (reader.Read())
+                        {
+                            var entrega = new Entrega
+                            {
+                                Id = reader.GetInt32(0),
+                                Codigo = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                                FechaEntrega = reader.GetDateTime(2),
+                                EntregadoPor = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                                Observaciones = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                                RecibidoPor = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                                CantidadEntregada = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
+                                SolicitudId = solicitudId
+                            };
+
+                            lista.Add(entrega);
+                        }
+                    }
                 }
             }
 
-            return entregas;
-        }
-
-        public Entrega ObtenerPorId(int id)
-        {
-            Entrega entrega = null;
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                string query = "SELECT * FROM Entrega WHERE Id = @Id";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", id);
-
-                conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    entrega = new Entrega
-                    {
-                        Id = Convert.ToInt32(reader["Id"]),
-                        FechaEntrega = Convert.ToDateTime(reader["FechaEntrega"]),
-                        EntregadoPor = reader["EntregadoPor"].ToString(),
-                        SolicitudId = Convert.ToInt32(reader["SolicitudId"]),
-                        Observaciones = reader["Observaciones"] != DBNull.Value ? reader["Observaciones"].ToString() : null,
-                        RecibidoPor = reader["RecibidoPor"].ToString()
-                    };
-                }
-            }
-
-            return entrega;
-        }
-
-        public void Actualizar(Entrega entrega)
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                string query = @"
-                    UPDATE Entrega
-                    SET FechaEntrega = @FechaEntrega,
-                        EntregadoPor = @EntregadoPor,
-                        SolicitudId = @SolicitudId,
-                        Observaciones = @Observaciones,
-                        RecibidoPor = @RecibidoPor
-                    WHERE Id = @Id";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", entrega.Id);
-                cmd.Parameters.AddWithValue("@FechaEntrega", entrega.FechaEntrega);
-                cmd.Parameters.AddWithValue("@EntregadoPor", entrega.EntregadoPor);
-                cmd.Parameters.AddWithValue("@SolicitudId", entrega.SolicitudId);
-                cmd.Parameters.AddWithValue("@Observaciones", entrega.Observaciones ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@RecibidoPor", entrega.RecibidoPor);
-
-                conn.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        public void Eliminar(int id)
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                string query = "DELETE FROM Entrega WHERE Id = @Id";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", id);
-
-                conn.Open();
-                cmd.ExecuteNonQuery();
-            }
+            return lista;
         }
     }
 }

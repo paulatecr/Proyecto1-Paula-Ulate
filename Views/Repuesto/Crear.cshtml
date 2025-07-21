@@ -1,33 +1,109 @@
-﻿@model Proyecto1_Paula_Ulate.Models.Repuesto
+﻿@model Proyecto1_Paula_Ulate.Models.Entrega
+@using Proyecto1_Paula_Ulate.Models
 
 @{
-    ViewBag.Title = "Crear Repuesto";
+    ViewBag.Title = "Registrar Entrega";
+    var solicitud = ViewBag.Solicitud as Solicitud;
+    var repuesto = solicitud?.Repuesto;
+    int cantidadDisponible = repuesto?.CantidadDisponible ?? 0;
+    int cantidadPendiente = Convert.ToInt32(ViewBag.CantidadPendiente);
 }
 
 <div class="form-container">
-    <h1>Registrar Nuevo Repuesto</h1>
+    <h1>Registrar Entrega</h1>
 
-    @using (Html.BeginForm())
+    @using (Html.BeginForm("Crear", "Entrega", FormMethod.Post))
     {
-        @Html.LabelFor(m => m.Nombre)
-        @Html.TextBoxFor(m => m.Nombre, new { required = "required" })
-        @Html.ValidationMessageFor(m => m.Nombre)
+        @Html.HiddenFor(m => m.SolicitudId)
+        @Html.Hidden("CantidadDisponible", cantidadDisponible)
+        @Html.Hidden("CantidadPendiente", cantidadPendiente)
 
-        @Html.LabelFor(m => m.Descripcion)
-        @Html.TextAreaFor(m => m.Descripcion, new { required = "required", rows = 3 })
-        @Html.ValidationMessageFor(m => m.Descripcion)
+        <div class="form-group">
+            <label>Solicitud:</label>
+            <p>@solicitud.Codigo</p>
+        </div>
 
-        @Html.LabelFor(m => m.CantidadDisponible)
-        @Html.TextBoxFor(m => m.CantidadDisponible, new { type = "number", min = "0", required = "required" })
-        @Html.ValidationMessageFor(m => m.CantidadDisponible)
+        <div class="form-group">
+            <label>Repuesto:</label>
+            <p>@repuesto.Codigo - @repuesto.Nombre</p>
+        </div>
 
-        @Html.LabelFor(m => m.PrecioUnitario)<label> /$</label>
-        @Html.TextBoxFor(m => m.PrecioUnitario, new { type = "number", step = "0.01", min = "0", required = "required" })
-        @Html.ValidationMessageFor(m => m.PrecioUnitario)
+        <div class="form-group">
+            <label>Cantidad Pendiente:</label>
+            <p id="cantidadPendienteTexto">@cantidadPendiente</p><!-- @cantidadPendiente-->
+        </div>
+
+
+            <label>:</label>
+            <p>2</p>-->
+
+
+        <div class="form-group">
+            <label for="CantidadEntregada">Cantidad a Entregar:</label>
+            <input type="number" name="CantidadEntregada" id="CantidadEntregada" min="1" required />
+        </div>
+
+        <div class="form-group">
+            <label for="RecibidoPor">Recibido Por:</label>
+            @Html.TextBoxFor(m => m.RecibidoPor, new { @class = "form-control", required = "required" })
+        </div>
+
+        <div class="form-group">
+            <label for="Observaciones">Observaciones:</label>
+            @Html.TextAreaFor(m => m.Observaciones, new { rows = 3, @class = "form-control" })
+        </div>
 
         <div class="button-container">
-            <button type="submit" class="button">Guardar Repuesto</button>
+            <button type="button" class="button" id="btnValidar">Registrar Entrega</button>
+            <a href="@Url.Action("Index", "Solicitud")" class="button">Cancelar</a>
         </div>
     }
 </div>
 
+    <!-- Modal Confirmación -->
+            <div id="modalConfirmacion" class="modal" style="display: none;">
+                <div class="modal-contenido">
+                    <h3>Confirmar Entrega</h3>
+                    <p>¿Está seguro de registrar esta entrega?</p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="button" id="btnConfirmar">Confirmar</button>
+                        <button class="button" onclick="cerrarModal()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Error -->
+            <div id="modalError" class="modal" style="display: none;">
+                <div class="modal-contenido">
+                    <h3>Error</h3>
+                    <p>La cantidad a entregar no puede ser mayor a la cantidad disponible ni mayor a la cantidad pendiente.</p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="button" onclick="cerrarModal()">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+
+            @section scripts {
+                <script>
+                    document.getElementById("btnValidar").addEventListener("click", function () {
+                        var cantidadEntregada = parseInt(document.getElementById("CantidadEntregada").value);
+                        var cantidadDisponible = parseInt(document.getElementById("CantidadDisponible").value);
+                        var cantidadPendiente = parseInt(document.getElementById("CantidadPendiente").value);
+
+                        if (cantidadEntregada > cantidadDisponible || cantidadEntregada > cantidadPendiente) {
+                            document.getElementById("modalError").style.display = "block";
+                        } else {
+                            document.getElementById("modalConfirmacion").style.display = "block";
+                        }
+                    });
+
+                    document.getElementById("btnConfirmar").addEventListener("click", function () {
+                        document.forms[0].submit();
+                    });
+
+                    function cerrarModal() {
+                        document.getElementById("modalConfirmacion").style.display = "none";
+                        document.getElementById("modalError").style.display = "none";
+                    }
+                </script>
+            }

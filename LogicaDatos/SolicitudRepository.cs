@@ -110,11 +110,10 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-            SELECT s.Id, s.Solicitante, s.Codigo, s.FechaSolicitud,
-                   s.RepuestoId, s.CantidadSolicitada, s.Estado,
-                   r.Nombre AS NombreRepuesto, r.Codigo AS CodigoRepuesto
+            SELECT s.Id, s.Solicitante, s.Codigo, s.FechaSolicitud, s.RepuestoId, s.CantidadSolicitada, s.Estado,
+                   r.Codigo AS RepuestoCodigo, r.Nombre AS RepuestoNombre
             FROM Solicitud s
-            INNER JOIN Repuesto r ON s.RepuestoId = r.Id";
+            JOIN Repuesto r ON s.RepuestoId = r.Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -134,14 +133,23 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                                 Estado = reader.GetString(6),
                                 Repuesto = new Repuesto
                                 {
-                                    Nombre = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                                    Codigo = reader.IsDBNull(8) ? "" : reader.GetString(8)
-                                }
+                                    Codigo = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                                    Nombre = reader.IsDBNull(8) ? "" : reader.GetString(8)
+                                },
+                                Entregas = new List<Entrega>()
                             };
+
                             lista.Add(solicitud);
                         }
                     }
                 }
+            }
+
+            // Cargar entregas asociadas para cada solicitud
+            var entregaRepo = new EntregaRepository();
+            foreach (var solicitud in lista)
+            {
+                solicitud.Entregas = entregaRepo.ObtenerPorSolicitudId(solicitud.Id);
             }
 
             return lista;

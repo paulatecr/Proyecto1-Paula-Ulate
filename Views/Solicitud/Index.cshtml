@@ -5,6 +5,7 @@
     ViewBag.Title = "Lista de Solicitudes";
     var usuarioSesion = Session["UsuarioLogueado"] as Usuario;
     bool puedeEditar = usuarioSesion != null && (usuarioSesion.Rol == "Administrador" || usuarioSesion.Rol == "Mecanico");
+    bool puedeEntregar = usuarioSesion != null && (usuarioSesion.Rol == "Administrador" || usuarioSesion.Rol == "Encargado");
 }
 
 @if (puedeEditar)
@@ -43,21 +44,32 @@
                 <tr>
                     <th>Código</th>
                     <th>Solicitante</th>
-                    <th>Fecha</th>
+                    <th>Fecha Solicitud</th>
                     <th>Código Repuesto</th>
-                    <th>Repuesto</th>
-                    <th>Cantidad</th>
+                    <th>Nombre de Repuesto</th>
+                    <th>Cantidad Solicitada</th>
                     <th>Estado</th>
+                    <th>Entregas Realizadas</th>
+                    <th>Cantidad Pendiente</th>
+
                     @if (puedeEditar)
                     {
                         <th>Editar</th>
                         <th>Eliminar</th>
+                    }
+                    @if (puedeEntregar)
+                    {
+                        <th>Entregar</th>
                     }
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
+                    var entregas = item.Entregas ?? new List<Proyecto1_Paula_Ulate.Models.Entrega>();
+                    var totalEntregado = entregas.Sum(e => e.CantidadEntregada);
+                    var cantidadPendiente = item.CantidadSolicitada - totalEntregado;
+
                     <tr>
                         <td>@item.Codigo</td>
                         <td>@item.Solicitante</td>
@@ -66,6 +78,36 @@
                         <td>@item.Repuesto.Nombre</td>
                         <td>@item.CantidadSolicitada</td>
                         <td>@item.Estado</td>
+
+                        <td>
+                            @if (entregas.Any())
+                            {
+                                foreach (var entrega in entregas)
+                                {
+                                    <div>
+                                     Entrega: @entrega.Codigo / Cantidad: @entrega.CantidadEntregada, 
+                                        
+                                    </div> 
+
+                                }
+                            }
+                            else
+                            {
+                                <div>Sin entregas</div>
+                            }
+                        </td>
+
+                        <td>
+                            @if (cantidadPendiente > 0)
+                            {
+                                @cantidadPendiente
+                            }
+                            else
+                            {
+                                <span style="color: green;">Completado</span>
+                            }
+                        </td>
+
                         @if (puedeEditar && item.Estado != "Entregada" && item.Estado != "Pendiente")
                         {
                             <td>
@@ -79,6 +121,20 @@
                         {
                             <td></td>
                             <td></td>
+                        }
+
+                        @if (puedeEntregar)
+                        {
+                            if (item.Estado == "Nueva" || item.Estado == "Pendiente")
+                            {
+                                <td>
+                                    <a href="@Url.Action("Crear", "Entrega", new { sId = item.Id })" class="button" title="Crear Entrega">📦</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
                         }
                     </tr>
                 }

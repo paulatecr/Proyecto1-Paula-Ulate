@@ -8,7 +8,9 @@ namespace Proyecto1_Paula_Ulate.Models
     public class Entrega
     {
         public int Id { get; set; }
+        public string Codigo { get; set; }
         public DateTime FechaEntrega { get; set; }
+        public int CantidadEntregada { get; set; }
 
         public string EntregadoPor { get; set; }
 
