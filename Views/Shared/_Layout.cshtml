@@ -30,17 +30,37 @@
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
-                        <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
-                        <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
-                        <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
-
                         if (user.Rol == "Administrador")
                         {
                             <li>@Html.ActionLink("Usuarios Existentes", "Index", "Usuario", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Registrar Entrada", "RegistrarEntrada", "Repuesto", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
                         }
 
-                        <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
+                        if (user.Rol == "Encargado")
+                        {
+                            <li>@Html.ActionLink("Registrar Entrada", "RegistrarEntrada", "Repuesto", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
+                        }
+
+                        if (user.Rol == "Mecanico")
+                        {
+
+                            <li>@Html.ActionLink("Repuestos", "Index", "Repuesto", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Solicitudes", "Index", "Solicitud", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Entregas", "Index", "Entrega", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Perfil Usuario", "Perfil", "Usuario", null, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Home", null, new { @class = "nav-link" })</li>
+
+                        }
                     }
                 </ul>
             </div>

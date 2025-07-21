@@ -5,63 +5,83 @@
 
 @model List<Proyecto1_Paula_Ulate.Models.Repuesto>
 
+
 @{
-    ViewBag.Title = "Lista de Repuestos";
+    var usuarioSesion = Session["UsuarioLogueado"] as Proyecto1_Paula_Ulate.Models.Usuario;
+    bool puedeEditar = usuarioSesion != null && (usuarioSesion.Rol == "Administrador" || usuarioSesion.Rol == "Encargado");
 }
 
-<div class="form-container">
-    <h1>Lista de Repuestos</h1>
+<h1>Lista de Repuestos</h1>
 
-    <div style="margin: 20px auto; text-align: center;">
+@if (TempData["Mensaje"] != null)
+{
+    <p style="color: green; text-align: center;">@TempData["Mensaje"]</p>
+}
+@if (TempData["Error"] != null)
+{
+    <p style="color: red; text-align: center;">@TempData["Error"]</p>
+}
+<div class="form-container">
+    <div style="margin: 10px auto; text-align: center;">
         <label for="busqueda">Buscar por ID o Nombre:</label>
         <input type="text" id="busqueda" placeholder="Ingrese texto para filtrar" style="width: 80%;" />
     </div>
 </div>
-    @if (Model != null && Model.Any())
-    {
-        <div id="datoTabla">
-            <table id="tablaRepuestos">
-                <thead>
-                    <tr>
-                        <th>Codigo</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Cantidad Disponible</th>
-                        <th>Precio Unitario/$</th>
+@if (Model != null && Model.Any())
+{
+    <div id="datoTabla">
+        <table id="tablaRepuestos">
+            <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Cantidad Disponible</th>
+                    <th>Precio Unitario/$</th>
+                    @if (puedeEditar)
+                    {
                         <th>Editar</th>
                         <th>Eliminar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Codigo</td>
-                            <td>@item.Nombre</td>
-                            <td class="descripcion-columna">@item.Descripcion</td>
-                            <td>@item.CantidadDisponible</td>
-                            <td>@item.PrecioUnitario.ToString("C")</td>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Nombre</td>
+                        <td class="descripcion-columna">@item.Descripcion</td>
+                        <td>@item.CantidadDisponible</td>
+                        <td>@item.PrecioUnitario.ToString("C")</td>
+                        @if (puedeEditar)
+                        {
                             <td>
                                 <a href="@Url.Action("Editar", "Repuesto", new { id = item.Id })" class="button" title="Editar">✏️</a>
                             </td>
                             <td>
                                 <button class="button btn-eliminar" data-id="@item.Id" data-nombre="@item.Nombre">🗑️</button>
                             </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
-    {
-        <p>No hay repuestos registrados.</p>
-    }
+                        }
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>No hay repuestos registrados.</p>
+}
 
 
-<div class="button-container" style="margin-top: 30px;">
-    @Html.ActionLink("Agregar Nuevo Repuesto", "Crear", "Repuesto", null, new { @class = "button" })
-</div>
+@if (puedeEditar)
+{
+    <div class="button-container" style="margin-top: 30px;">
+        @Html.ActionLink("Agregar Nuevo Repuesto", "Crear", "Repuesto", null, new { @class = "button" })
+    </div>
+}
 
 <!-- Modal de Confirmación -->
 <div id="modalConfirmacion" class="modal">

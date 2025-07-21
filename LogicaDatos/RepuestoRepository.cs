@@ -128,6 +128,20 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
             }
         }
 
+        public void ActualizarCantidad(Repuesto repuesto)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Repuesto SET CantidadDisponible = @Cantidad WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Cantidad", repuesto.CantidadDisponible);
+                cmd.Parameters.AddWithValue("@Id", repuesto.Id);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void Eliminar(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

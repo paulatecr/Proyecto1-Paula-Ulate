@@ -1,0 +1,117 @@
+﻿
+@model List<Proyecto1_Paula_Ulate.Models.Repuesto>
+
+@{
+    ViewBag.Title = "Registrar Ingreso de Repuestos";
+}
+
+<h1>Registrar Ingreso de Repuestos</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <p style="color: green; text-align: center;">@TempData["Mensaje"]</p>
+}
+@if (TempData["Error"] != null)
+{
+    <p style="color: red; text-align: center;">@TempData["Error"]</p>
+}
+
+
+
+@if (Model != null && Model.Any())
+{
+    <div id="datoTabla">
+        <table id="tablaRepuestos">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Cantidad Actual</th>
+                    <th>Ingresar Cantidad</th>
+                    <th>Total Nuevo</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-id="@item.Id">
+                        <td>@item.Codigo</td>
+                        <td class="nombreRepuesto-columna">@item.Nombre</td>
+                        <td class="descripcion-columna">@item.Descripcion</td>
+                        <td class="cantidad-actual">@item.CantidadDisponible</td>
+                        <td class="ingresarCantidad-columna">
+                            <input type="number" class="input-ingreso" min="1" />
+                        </td>
+                        <td class="total-nuevo"></td>
+                        <td>
+                            <button class="button btn-registrar" data-id="@item.Id" data-codigo="@item.Codigo" data-nombre="@item.Nombre">📦</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>No hay repuestos registrados.</p>
+}
+
+<!-- Modal de Confirmación -->
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-contenido">
+        <h3>Confirmar ingreso</h3>
+        <p id="textoModal"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmarIngreso">Confirmar</button>
+            <button class="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let idSeleccionado = 0;
+        let cantidadNueva = 0;
+
+        document.querySelectorAll(".input-ingreso").forEach(input => {
+            input.addEventListener("input", function () {
+                const row = this.closest("tr");
+                const actual = parseInt(row.querySelector(".cantidad-actual").textContent);
+                const ingreso = parseInt(this.value) || 0;
+                const total = actual + ingreso;
+                row.querySelector(".total-nuevo").textContent = total;
+            });
+        });
+
+        document.querySelectorAll(".btn-registrar").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const row = this.closest("tr");
+                idSeleccionado = this.getAttribute("data-id");
+                const nombre = this.getAttribute("data-nombre");
+                const codigo = this.getAttribute("data-codigo");
+                const input = row.querySelector(".input-ingreso");
+                cantidadNueva = parseInt(input.value);
+
+                if (!cantidadNueva || cantidadNueva < 1) {
+                    alert("Ingrese una cantidad válida");
+                    return;
+                }
+
+                document.getElementById("textoModal").textContent = `¿Desea registrar ${cantidadNueva} unidades nuevas para el repuesto "${codigo}" - "${nombre}"?`;
+                document.getElementById("modalConfirmacion").style.display = "block";
+            });
+        });
+
+        document.getElementById("btnConfirmarIngreso").addEventListener("click", function () {
+            window.location.href = "/Repuesto/RegistrarCantidad?id=" + idSeleccionado + "&cantidad=" + cantidadNueva;
+        });
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        }
+    </script>
+}
+
