@@ -198,11 +198,14 @@
     <Content Include="Views\Repuesto\Index.cshtml" />
     <Content Include="Views\Repuesto\Editar.cshtml" />
     <Content Include="Views\Repuesto\RegistrarEntrada.cshtml" />
+    <Content Include="Views\Solicitud\Crear.cshtml" />
+    <Content Include="Views\Solicitud\Index.cshtml" />
+    <Content Include="Views\Solicitud\Editar.cshtml" />
+    <Content Include="Views\Solicitud\CrearDesdeBoton.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Entrega\" />
-    <Folder Include="Views\Solicitud\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

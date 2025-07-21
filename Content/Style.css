@@ -37,6 +37,13 @@
     /*color: white;*/
 }
 
+.h1-Index {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4A148C;
+    text-align: center;
+}
+
 
 input, select, textarea {
     width: 100%;
@@ -119,6 +126,8 @@ body {
     font-family: Arial, sans-serif;
     margin: 40px;
 }
+
+
 
 input, select {
     display: block;
@@ -209,10 +218,11 @@ body.claro {
 }
 
 /* Tema oscuro */
-body.oscuro {
+body.oscuro{
     background-color: #121212;
     color: white;
 }
+
     body.oscuro input,
     body.oscuro select,
     body.oscuro textarea,
@@ -246,6 +256,10 @@ body.oscuro {
         border: 1px solid #888;
     }
 
+    body.oscuro .h1-Index {
+        color: #f7a5d3; /* rosado clarito */
+    }
+
     body.oscuro table {
         border-color: #7e57c2;
     }
@@ -262,6 +276,15 @@ body.oscuro {
     body.oscuro .nav-link {
         color: #ffffff;
     }
+
+    body.oscuro .modal-contenido {
+        background-color: #333; /* fondo oscuro */
+        color: white; /* texto blanco */
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
 
 body.normal {
     font-size: 16px;

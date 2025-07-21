@@ -10,6 +10,8 @@ namespace Proyecto1_Paula_Ulate.Models
 
         public int Id { get; set; }
 
+        public string Codigo { get; set; }
+
         public string Solicitante { get; set; }
 
         public DateTime FechaSolicitud { get; set; }
@@ -20,6 +22,6 @@ namespace Proyecto1_Paula_Ulate.Models
 
         public int CantidadSolicitada { get; set; }
 
-        public string Estado { get; set; } // Ej: Pendiente, Aprobada, Rechazada
+        public string Estado { get; set; }
     }
 }

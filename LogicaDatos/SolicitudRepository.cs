@@ -21,11 +21,16 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"
-                    INSERT INTO Solicitudes (Solicitante, FechaSolicitud, RepuestoId, CantidadSolicitada, Estado)
-                    VALUES (@Solicitante, @FechaSolicitud, @RepuestoId, @CantidadSolicitada, @Estado)";
+                conn.Open();
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                // Paso 1: Insertar solicitud
+                string insertQuery = @"
+            INSERT INTO Solicitud (Solicitante, FechaSolicitud, RepuestoId, CantidadSolicitada, Estado)
+            VALUES (@Solicitante, @FechaSolicitud, @RepuestoId, @CantidadSolicitada, @Estado);
+            SELECT SCOPE_IDENTITY();";
+
+                int nuevoId = 0;
+                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@Solicitante", solicitud.Solicitante);
                     cmd.Parameters.AddWithValue("@FechaSolicitud", solicitud.FechaSolicitud);
@@ -33,21 +38,35 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                     cmd.Parameters.AddWithValue("@CantidadSolicitada", solicitud.CantidadSolicitada);
                     cmd.Parameters.AddWithValue("@Estado", solicitud.Estado);
 
-                    conn.Open();
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                        nuevoId = Convert.ToInt32(result);
+                }
+
+                // Paso 2: Actualizar el Código generado
+                string nuevoCodigo = "S-" + nuevoId.ToString("D3");
+
+                string updateQuery = "UPDATE Solicitud SET Codigo = @Codigo WHERE Id = @Id";
+                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Codigo", nuevoCodigo);
+                    cmd.Parameters.AddWithValue("@Id", nuevoId);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
 
         public void Actualizar(Solicitud solicitud)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                    UPDATE Solicitudes
+                    UPDATE Solicitud
                     SET Solicitante = @Solicitante,
                         FechaSolicitud = @FechaSolicitud,
                         RepuestoId = @RepuestoId,
+                        Codigo = @Codigo,
                         CantidadSolicitada = @CantidadSolicitada,
                         Estado = @Estado
                     WHERE Id = @Id";
@@ -55,6 +74,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@Solicitante", solicitud.Solicitante);
+                    cmd.Parameters.AddWithValue("@Codigo", solicitud.Codigo);
                     cmd.Parameters.AddWithValue("@FechaSolicitud", solicitud.FechaSolicitud);
                     cmd.Parameters.AddWithValue("@RepuestoId", solicitud.RepuestoId);
                     cmd.Parameters.AddWithValue("@CantidadSolicitada", solicitud.CantidadSolicitada);
@@ -71,7 +91,7 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "DELETE FROM Solicitudes WHERE Id = @Id";
+                string query = "DELETE FROM Solicitud WHERE Id = @Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -90,8 +110,11 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                    SELECT Id, Solicitante, FechaSolicitud, RepuestoId, CantidadSolicitada, Estado
-                    FROM Solicitudes";
+            SELECT s.Id, s.Solicitante, s.Codigo, s.FechaSolicitud,
+                   s.RepuestoId, s.CantidadSolicitada, s.Estado,
+                   r.Nombre AS NombreRepuesto, r.Codigo AS CodigoRepuesto
+            FROM Solicitud s
+            INNER JOIN Repuesto r ON s.RepuestoId = r.Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -104,16 +127,23 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                             {
                                 Id = reader.GetInt32(0),
                                 Solicitante = reader.GetString(1),
-                                FechaSolicitud = reader.GetDateTime(2),
-                                RepuestoId = reader.GetInt32(3),
-                                CantidadSolicitada = reader.GetInt32(4),
-                                Estado = reader.GetString(5)
+                                Codigo = reader.GetString(2),
+                                FechaSolicitud = reader.GetDateTime(3),
+                                RepuestoId = reader.GetInt32(4),
+                                CantidadSolicitada = reader.GetInt32(5),
+                                Estado = reader.GetString(6),
+                                Repuesto = new Repuesto
+                                {
+                                    Nombre = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                                    Codigo = reader.IsDBNull(8) ? "" : reader.GetString(8)
+                                }
                             };
                             lista.Add(solicitud);
                         }
                     }
                 }
             }
+
             return lista;
         }
 
@@ -124,9 +154,12 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                    SELECT Id, Solicitante, FechaSolicitud, RepuestoId, CantidadSolicitada, Estado
-                    FROM Solicitudes
-                    WHERE Id = @Id";
+            SELECT s.Id, s.Solicitante, s.Codigo, s.FechaSolicitud,
+                   s.RepuestoId, s.CantidadSolicitada, s.Estado,
+                   r.Nombre AS NombreRepuesto, r.Codigo AS CodigoRepuesto
+            FROM Solicitud s
+            INNER JOIN Repuesto r ON s.RepuestoId = r.Id
+            WHERE s.Id = @Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -141,15 +174,22 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
                             {
                                 Id = reader.GetInt32(0),
                                 Solicitante = reader.GetString(1),
-                                FechaSolicitud = reader.GetDateTime(2),
-                                RepuestoId = reader.GetInt32(3),
-                                CantidadSolicitada = reader.GetInt32(4),
-                                Estado = reader.GetString(5)
+                                Codigo = reader.GetString(2),
+                                FechaSolicitud = reader.GetDateTime(3),
+                                RepuestoId = reader.GetInt32(4),
+                                CantidadSolicitada = reader.GetInt32(5),
+                                Estado = reader.GetString(6),
+                                Repuesto = new Repuesto
+                                {
+                                    Nombre = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                                    Codigo = reader.IsDBNull(8) ? "" : reader.GetString(8)
+                                }
                             };
                         }
                     }
                 }
             }
+
             return solicitud;
         }
     }

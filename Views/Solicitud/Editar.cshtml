@@ -1,0 +1,134 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Solicitud
+@using Proyecto1_Paula_Ulate.Models
+
+@{
+    ViewBag.Title = "Editar Solicitud";
+    var usuarioSesion = Session["UsuarioLogueado"] as Usuario;
+    bool esAdministrador = usuarioSesion != null && usuarioSesion.Rol == "Administrador";
+    var repuestos = ViewBag.Repuestos as List<Repuesto>;
+    var repuestoSeleccionado = repuestos.FirstOrDefault(r => r.Id == Model.RepuestoId);
+}
+
+<div class="form-container">
+    <h2>Editar Solicitud</h2>
+
+    @using (Html.BeginForm("Editar", "Solicitud", FormMethod.Post, new { id = "formEditarSolicitud" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.Solicitante)
+        @Html.HiddenFor(model => model.FechaSolicitud)
+        @Html.HiddenFor(model => model.Codigo)
+
+        <div class="form-group">
+            <label>Código:</label>
+            <p class="form-control" readonly>@Model.Codigo</p>
+        </div>
+
+        <div class="form-group">
+            <label>Solicitante:</label>
+            <p class="form-control" readonly>@Model.Solicitante</p>
+        </div>
+
+        <div class="form-group">
+            <label>Fecha de Solicitud:</label>
+            <p class="form-control" readonly>@Model.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+
+        <div class="form-group">
+            <label for="RepuestoId">Repuesto:</label>
+            <select id="RepuestoId" name="RepuestoId" class="form-control" required onchange="actualizarCantidadDisponible()">
+                @foreach (var repuesto in repuestos)
+                {
+                    <option value="@repuesto.Id"
+                            data-codigo="@repuesto.Codigo"
+                            data-nombre="@repuesto.Nombre"
+                            data-cantidad="@repuesto.CantidadDisponible"
+                            @(repuesto.Id == Model.RepuestoId ? "selected" : "")>
+                        @repuesto.Codigo - @repuesto.Nombre
+                    </option>
+                }
+            </select>
+            <br />
+            <p><strong>Código del repuesto seleccionado:</strong> <span id="codigoRepuesto"></span></p>
+            <p><strong>Nombre del repuesto seleccionado:</strong> <span id="nombreRepuesto"></span></p>
+            <p><strong>Cantidad disponible:</strong> <span id="cantidadDisponibleTexto"></span></p>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CantidadSolicitada)
+            @Html.TextBoxFor(model => model.CantidadSolicitada, new { @class = "form-control", type = "number", min = "1", required = "required" })
+            @Html.ValidationMessageFor(model => model.CantidadSolicitada)
+        </div>
+
+        if (esAdministrador)
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Estado)
+                @Html.DropDownListFor(model => model.Estado, new SelectList(new[] {
+                    "Nueva", "Pendiente", "Entregada"
+                }, Model.Estado), "Seleccione un estado", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Estado)
+            </div>
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.Estado)
+            <div class="form-group">
+                <label>Estado:</label>
+                <p class="form-control" readonly>@Model.Estado</p>
+            </div>
+        }
+
+        <button type="button" class="button" id="btnGuardarCambios">Guardar Cambios</button>
+        <a href="@Url.Action("Index", "Solicitud")" class="button">Cancelar</a>
+    }
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="modalConfirmacion" class="modal" style="display: none;">
+    <div class="modal-contenido">
+        <h3>Atención</h3>
+        <p>La cantidad solicitada excede lo disponible. Se enviará lo que hay en bodega y lo demás quedará pendiente.</p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmar">Confirmar</button>
+            <button class="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+<script>
+    function actualizarCantidadDisponible() {
+        const select = document.getElementById("RepuestoId");
+        const cantidad = select.options[select.selectedIndex].getAttribute("data-cantidad");
+        document.getElementById("cantidadDisponibleTexto").innerText = cantidad;
+    }
+
+    function cerrarModal() {
+        document.getElementById("modalConfirmacion").style.display = "none";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        actualizarCantidadDisponible();
+
+        const form = document.getElementById("formEditarSolicitud");
+
+        document.getElementById("btnGuardarCambios").addEventListener("click", function () {
+            const cantidadSolicitada = parseInt(document.getElementById("CantidadSolicitada").value);
+            const cantidadActual = parseInt(document.getElementById("cantidadDisponibleTexto").innerText);
+
+            if (cantidadSolicitada > cantidadActual) {
+                document.getElementById("modalConfirmacion").style.display = "block";
+            } else {
+                form.submit();
+            }
+        });
+
+        document.getElementById("btnConfirmar").addEventListener("click", function () {
+            form.submit();
+        });
+    });
+</script>
+}

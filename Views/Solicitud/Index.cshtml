@@ -1,0 +1,139 @@
+﻿@model List<Proyecto1_Paula_Ulate.Models.Solicitud>
+@using Proyecto1_Paula_Ulate.Models
+
+@{
+    ViewBag.Title = "Lista de Solicitudes";
+    var usuarioSesion = Session["UsuarioLogueado"] as Usuario;
+    bool puedeEditar = usuarioSesion != null && (usuarioSesion.Rol == "Administrador" || usuarioSesion.Rol == "Mecanico");
+}
+
+@if (puedeEditar)
+{
+    <div class="button-container" style="margin-top: 30px;">
+        @Html.ActionLink("Crear Nueva Solicitud", "CrearDesdeBoton", "Solicitud", null, new { @class = "button" })
+    </div>
+}
+<br />
+<br />
+
+<h1 class="h1-Index">Lista de Solicitudes</h1>
+
+<div class="form-container">
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <p style="color: green; text-align: center;">@TempData["Mensaje"]</p>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <p style="color: red; text-align: center;">@TempData["Error"]</p>
+    }
+
+    <div style="margin: 20px auto; text-align: center;">
+        <label for="busqueda">Buscar por ID, Repuesto o Solicitante:</label>
+        <input type="text" id="busqueda" placeholder="Ingrese texto para filtrar" style="width: 80%;" />
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div id="datoTabla">
+        <table id="tablaSolicitudes">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Solicitante</th>
+                    <th>Fecha</th>
+                    <th>Código Repuesto</th>
+                    <th>Repuesto</th>
+                    <th>Cantidad</th>
+                    <th>Estado</th>
+                    @if (puedeEditar)
+                    {
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Solicitante</td>
+                        <td>@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.Repuesto.Codigo</td>
+                        <td>@item.Repuesto.Nombre</td>
+                        <td>@item.CantidadSolicitada</td>
+                        <td>@item.Estado</td>
+                        @if (puedeEditar && item.Estado != "Entregada" && item.Estado != "Pendiente")
+                        {
+                            <td>
+                                <a href="@Url.Action("Editar", "Solicitud", new { id = item.Id })" class="button" title="Editar">✏️</a>
+                            </td>
+                            <td>
+                                <button class="button btn-eliminar" data-id="@item.Id" data-codigo="@item.Codigo">🗑️</button>
+                            </td>
+                        }
+                        else if (puedeEditar)
+                        {
+                            <td></td>
+                            <td></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>No hay solicitudes registradas.</p>
+}
+
+<!-- Modal Confirmación Eliminar -->
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-contenido">
+        <h3>Confirmar eliminación</h3>
+        <p id="textoModal"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmarEliminar">Eliminar</button>
+            <button class="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let idSeleccionado = 0;
+
+        document.querySelectorAll(".btn-eliminar").forEach(btn => {
+            btn.addEventListener("click", function () {
+                idSeleccionado = this.getAttribute("data-id");
+                const codigo = this.getAttribute("data-codigo");
+                document.getElementById("textoModal").textContent = `¿Desea eliminar la solicitud "${codigo}"?`;
+                document.getElementById("modalConfirmacion").style.display = "block";
+            });
+        });
+
+        document.getElementById("btnConfirmarEliminar").addEventListener("click", function () {
+            window.location.href = "/Solicitud/Eliminar/" + idSeleccionado;
+        });
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        }
+
+        document.getElementById("busqueda").addEventListener("keyup", function () {
+            var texto = this.value.toLowerCase();
+            var filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
+
+            filas.forEach(function (fila) {
+                var cod = fila.cells[3].textContent.toLowerCase();
+                var sol = fila.cells[1].textContent.toLowerCase();
+                var rep = fila.cells[4].textContent.toLowerCase();
+                fila.style.display = (cod.includes(texto) || sol.includes(texto) || rep.includes(texto)) ? "" : "none";
+            });
+        });
+    </script>
+}

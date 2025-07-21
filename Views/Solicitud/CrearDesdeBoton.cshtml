@@ -1,0 +1,95 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Solicitud
+@using Proyecto1_Paula_Ulate.Models
+
+@{
+    ViewBag.Title = "Crear Nueva Solicitud";
+    var repuestos = ViewBag.Repuestos as List<Repuesto>;
+}
+
+<div class="form-container">
+    <h1>Crear Nueva Solicitud</h1>
+
+    @using (Html.BeginForm("CrearDesdeBoton", "Solicitud", FormMethod.Post, new { id = "formCrearSolicitud" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label for="RepuestoId">Repuesto:</label>
+            <select id="RepuestoId" name="RepuestoId" class="form-control" required onchange="actualizarCantidadDisponible()">
+                <option value="">Seleccione un repuesto</option>
+                @foreach (var repuesto in repuestos)
+                {
+                    <option value="@repuesto.Id" data-cantidad="@repuesto.CantidadDisponible">
+                        @repuesto.Codigo - @repuesto.Nombre
+                    </option>
+                }
+            </select>
+            <p><strong>Cantidad disponible:</strong> <span id="cantidadDisponibleTexto">0</span></p>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CantidadSolicitada)
+            @Html.TextBoxFor(model => model.CantidadSolicitada, new
+            {
+                @class = "form-control",
+                type = "number",
+                min = "1",
+                required = "required",
+                id = "CantidadSolicitada"
+            })
+            @Html.ValidationMessageFor(model => model.CantidadSolicitada)
+        </div>
+
+        <!-- Campos ocultos: el controlador asignará estos valores -->
+        @Html.HiddenFor(m => m.Solicitante)
+        @Html.HiddenFor(m => m.FechaSolicitud)
+        @Html.HiddenFor(m => m.Estado)
+
+        <button type="submit" class="button" id="btnEnviar">Enviar Solicitud</button>
+        <a href="@Url.Action("Index", "Solicitud")" class="button">Cancelar</a>
+    }
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="modalConfirmacion" class="modal" style="display: none;">
+    <div class="modal-contenido">
+        <h3>Advertencia</h3>
+        <p>La cantidad solicitada excede la disponible. Se enviará lo que hay en bodega y lo demás quedará pendiente.</p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmar">Confirmar</button>
+            <button class="button" type="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function actualizarCantidadDisponible() {
+            const select = document.getElementById("RepuestoId");
+            const cantidad = select.options[select.selectedIndex]?.getAttribute("data-cantidad") || 0;
+            document.getElementById("cantidadDisponibleTexto").textContent = cantidad;
+        }
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        }
+
+        document.getElementById("btnEnviar").addEventListener("click", function (e) {
+            const cantidadSolicitada = parseInt(document.getElementById("CantidadSolicitada").value);
+            const cantidadDisponible = parseInt(document.getElementById("cantidadDisponibleTexto").textContent);
+
+            if (!isNaN(cantidadSolicitada) && cantidadSolicitada > cantidadDisponible) {
+                e.preventDefault(); // Detiene envío
+                document.getElementById("modalConfirmacion").style.display = "block";
+            }
+        });
+
+        document.getElementById("btnConfirmar").addEventListener("click", function () {
+            document.getElementById("formCrearSolicitud").submit();
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            actualizarCantidadDisponible();
+        });
+    </script>
+}

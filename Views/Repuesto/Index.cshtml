@@ -9,9 +9,20 @@
 @{
     var usuarioSesion = Session["UsuarioLogueado"] as Proyecto1_Paula_Ulate.Models.Usuario;
     bool puedeEditar = usuarioSesion != null && (usuarioSesion.Rol == "Administrador" || usuarioSesion.Rol == "Encargado");
+    bool puedeSolicitar = usuarioSesion != null && (usuarioSesion.Rol == "Administrador" || usuarioSesion.Rol == "Mecanico");
 }
 
-<h1>Lista de Repuestos</h1>
+@if (puedeEditar)
+{
+    <div class="button-container" style="margin-top: 30px;">
+        @Html.ActionLink("Agregar Nuevo Repuesto", "Crear", "Repuesto", null, new { @class = "button" })
+    </div>
+}
+<br />
+<br />
+
+
+<h1 class=h1-Index>Lista de Repuestos</h1>
 
 @if (TempData["Mensaje"] != null)
 {
@@ -43,6 +54,10 @@
                         <th>Editar</th>
                         <th>Eliminar</th>
                     }
+                    @if (puedeSolicitar)
+                    {
+                        <th>Solicitar</th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -63,6 +78,13 @@
                                 <button class="button btn-eliminar" data-id="@item.Id" data-nombre="@item.Nombre">🗑️</button>
                             </td>
                         }
+
+                        @if (puedeSolicitar)
+                        {
+                            <td>
+                                <a href="@Url.Action("Crear", "Solicitud", new { repuestoId = item.Id })" class="button" title="Solicitar repuesto">📩</a>
+                            </td>
+                        }
                     </tr>
 
                 }
@@ -76,12 +98,7 @@ else
 }
 
 
-@if (puedeEditar)
-{
-    <div class="button-container" style="margin-top: 30px;">
-        @Html.ActionLink("Agregar Nuevo Repuesto", "Crear", "Repuesto", null, new { @class = "button" })
-    </div>
-}
+
 
 <!-- Modal de Confirmación -->
 <div id="modalConfirmacion" class="modal">

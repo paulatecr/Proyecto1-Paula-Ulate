@@ -1,0 +1,72 @@
+﻿@model Proyecto1_Paula_Ulate.Models.Solicitud
+
+@{
+    ViewBag.Title = "Nueva Solicitud";
+    var repuesto = ViewBag.Repuesto as Proyecto1_Paula_Ulate.Models.Repuesto;
+    var cantidadDisponible = repuesto?.CantidadDisponible ?? 0;
+}
+
+<div class="form-container">
+    <h1>Crear Nueva Solicitud</h1>
+
+    @if (repuesto == null)
+    {
+        <p style="color: red;">Debe seleccionar un repuesto válido para solicitar.</p>
+    }
+    else
+    {
+        using (Html.BeginForm("Crear", "Solicitud", FormMethod.Post))
+        {
+            @Html.HiddenFor(m => m.RepuestoId)
+            @Html.Hidden("CantidadDisponible", cantidadDisponible)
+
+            <label>Repuesto:</label>
+            <p>@repuesto.Nombre</p>
+
+            <label>Descripción:</label>
+            <p>@repuesto.Descripcion</p>
+
+            <label>Cantidad Disponible:</label>
+            <p id="cantidadActual">@cantidadDisponible</p>
+
+            <label for="CantidadSolicitada">Cantidad a Solicitar:</label>
+            <input type="number" name="CantidadSolicitada" id="CantidadSolicitada" min="1" required />
+
+            <button type="submit" class="button" id="btnEnviar">Enviar Solicitud</button>
+        }
+    }
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="modalConfirmacion" class="modal" style="display: none;">
+    <div class="modal-contenido">
+        <h3>Atención</h3>
+        <p>La cantidad solicitada excede lo disponible. Se enviará lo que hay en bodega y lo demás quedará pendiente.</p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="button" id="btnConfirmar">Confirmar</button>
+            <button class="button" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        document.getElementById("btnEnviar").addEventListener("click", function (e) {
+            var cantidadSolicitada = parseInt(document.getElementById("CantidadSolicitada").value);
+            var cantidadActual = parseInt(document.getElementById("cantidadActual").textContent);
+
+            if (cantidadSolicitada > cantidadActual) {
+                e.preventDefault(); // Evita que se envíe el formulario de inmediato
+                document.getElementById("modalConfirmacion").style.display = "block";
+            }
+        });
+
+        document.getElementById("btnConfirmar").addEventListener("click", function () {
+            document.forms[0].submit(); // Enviar formulario
+        });
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        }
+    </script>
+}

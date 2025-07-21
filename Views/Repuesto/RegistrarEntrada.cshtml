@@ -5,7 +5,7 @@
     ViewBag.Title = "Registrar Ingreso de Repuestos";
 }
 
-<h1>Registrar Ingreso de Repuestos</h1>
+<h1 class=h1-Index>Registrar Ingreso de Repuestos</h1>
 
 @if (TempData["Mensaje"] != null)
 {
@@ -16,7 +16,12 @@
     <p style="color: red; text-align: center;">@TempData["Error"]</p>
 }
 
-
+<div class="form-container">
+    <div style="margin: 10px auto; text-align: center;">
+        <label for="busqueda">Buscar por ID o Nombre:</label>
+        <input type="text" id="busqueda" placeholder="Ingrese texto para filtrar" style="width: 80%;" />
+    </div>
+</div>
 
 @if (Model != null && Model.Any())
 {
@@ -112,6 +117,18 @@ else
         function cerrarModal() {
             document.getElementById("modalConfirmacion").style.display = "none";
         }
+
+        document.getElementById("busqueda").addEventListener("keyup", function () {
+            var texto = this.value.toLowerCase();
+            var filas = document.querySelectorAll("#tablaRepuestos tbody tr");
+
+            filas.forEach(function (fila) {
+                var id = fila.cells[0].textContent.toLowerCase();
+                var nombre = fila.cells[1].textContent.toLowerCase();
+
+                fila.style.display = (id.includes(texto) || nombre.includes(texto)) ? "" : "none";
+            });
+        });
     </script>
 }
 

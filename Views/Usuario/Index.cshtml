@@ -8,8 +8,27 @@
 <div class="button-container" style="margin-top: 30px;">
     @Html.ActionLink("Crear Nuevo Usuario", "Crear", "Usuario", null, new { @class = "button" })
 </div>
+<br />
+<br />
 
-<h2>Usuarios Existentes</h2>
+<h1 class=h1-Index>Usuarios Existentes</h1>
+
+<div class="form-container">
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <p style="color: green; text-align: center;">@TempData["Mensaje"]</p>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <p style="color: red; text-align: center;">@TempData["Error"]</p>
+    }
+
+    <div style="margin: 20px auto; text-align: center;">
+        <label for="busqueda">Buscar por Usuario, Nombre o Rol:</label>
+        <input type="text" id="busqueda" placeholder="Ingrese texto para filtrar" style="width: 80%;" />
+    </div>
+</div>
 
 <div id="datoTabla">
     <table id="tablaUsuarios">
@@ -83,5 +102,18 @@
         function cerrarModal() {
             document.getElementById("modalConfirmacion").style.display = "none";
         }
+
+        document.getElementById("busqueda").addEventListener("keyup", function () {
+            var texto = this.value.toLowerCase();
+            var filas = document.querySelectorAll("#tablaUsuarios tbody tr");
+
+            filas.forEach(function (fila) {
+                var usuario = fila.cells[1].textContent.toLowerCase(); // Usuario
+                var nombre = fila.cells[2].textContent.toLowerCase();  // Nombre
+                var rol = fila.cells[5].textContent.toLowerCase();     // Rol
+
+                fila.style.display = (usuario.includes(texto) || nombre.includes(texto) || rol.includes(texto)) ? "" : "none";
+            });
+        });
     </script>
 }
