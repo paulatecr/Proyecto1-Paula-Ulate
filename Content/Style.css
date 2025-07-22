@@ -284,6 +284,12 @@ body.oscuro{
         padding: 20px;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     }
+    body.tema-oscuro .nueva-notificacion {
+        background-color: #2d2b36; 
+        color: #ffffff; 
+        font-weight: bold;
+    }
+
 
 
 body.normal {
@@ -348,4 +354,8 @@ body.extra td {
 
 .modal .button {
     margin: 0 10px;
+}
+
+.nueva-notificacion {
+    background-color: #f3e9ff;
 }

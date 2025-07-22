@@ -1,0 +1,46 @@
+﻿@model List<Proyecto1_Paula_Ulate.Models.Notificacion>
+@{
+    ViewBag.Title = "Notificaciones";
+}
+
+<h1 class="h1-Index">Notificaciones</h1>
+
+@if (!Model.Any())
+{
+    <p>No tienes notificaciones en este momento.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mensaje</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var noti in Model)
+            {
+                <tr class="@(noti.Estado == "Nuevo" ? "nueva-notificacion" : "")">
+                    <td style="font-weight: @(noti.Estado == "Nuevo" ? "bold" : "normal")">
+                        @noti.Mensaje
+                    </td>
+                    <td>@noti.Estado</td>
+                    <td>
+                        @if (noti.Estado == "Nuevo")
+                        {
+                            <a href="@Url.Action("MarcarComoLeida", "Notificacion", new { id = noti.Id })" class="button">
+                                Marcar como leída
+                            </a>
+                        }
+                        else
+                        {
+                            <span style="color: gray;">✔ Leída</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

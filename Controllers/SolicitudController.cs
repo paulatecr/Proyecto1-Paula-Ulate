@@ -1,7 +1,8 @@
-﻿using Proyecto1_Paula_Ulate.Models;
-using Proyecto1_Paula_Ulate.LogicaDatos;
+﻿using Proyecto1_Paula_Ulate.LogicaDatos;
+using Proyecto1_Paula_Ulate.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Proyecto1_Paula_Ulate.Controllers
@@ -10,11 +11,18 @@ namespace Proyecto1_Paula_Ulate.Controllers
     {
         private readonly SolicitudRepository repositorio;
         private readonly RepuestoRepository repuestoRepo;
+        private readonly UsuarioRepository usuarioRepo;
+        private readonly NotificacionRepository notificacionRepo;
+        private readonly string connectionString;
 
         public SolicitudController()
         {
+            var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString;
+
             repositorio = new SolicitudRepository();
-            repuestoRepo = new RepuestoRepository(System.Configuration.ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString);
+            repuestoRepo = new RepuestoRepository(connectionString);
+            usuarioRepo = new UsuarioRepository(connectionString);
+            notificacionRepo = new NotificacionRepository(connectionString);
         }
 
         // GET: Solicitud
@@ -76,6 +84,23 @@ namespace Proyecto1_Paula_Ulate.Controllers
             }
 
             repositorio.Insertar(solicitud);
+
+            var usuariosEncargados = usuarioRepo.ObtenerTodos()
+                .Where(u => u.Rol == "Encargado").ToList();
+
+            var mensaje = $"🔔 Nueva Solicitud {solicitud.Codigo} del repuesto {repuesto.Codigo} - {repuesto.Nombre} realizada por {usuario.Nombre}";
+
+            foreach (var encargado in usuariosEncargados)
+            {
+                var noti = new Notificacion
+                {
+                    UsuarioId = encargado.Id,
+                    Mensaje = mensaje,
+                    Estado = "Nuevo",
+                    Fecha = DateTime.Now
+                };
+                notificacionRepo.Insertar(noti);
+            }
 
             TempData["Mensaje"] = "Solicitud creada exitosamente.";
             return RedirectToAction("Index");

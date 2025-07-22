@@ -122,6 +122,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\EntregaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NotificacionController.cs" />
     <Compile Include="Controllers\RepuestoController.cs" />
     <Compile Include="Controllers\SolicitudController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -130,9 +131,11 @@
     </Compile>
     <Compile Include="LogicaDatos\ConexionBaseDatos.cs" />
     <Compile Include="LogicaDatos\EntregaRepository.cs" />
+    <Compile Include="LogicaDatos\NotificacionRepository.cs" />
     <Compile Include="LogicaDatos\RepuestoRepository.cs" />
     <Compile Include="LogicaDatos\SolicitudRepository.cs" />
     <Compile Include="LogicaDatos\UsuarioRepository.cs" />
+    <Compile Include="Models\Notificacion.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Models\Entrega.cs" />
     <Compile Include="Models\Repuesto.cs" />
@@ -204,6 +207,7 @@
     <Content Include="Views\Solicitud\CrearDesdeBoton.cshtml" />
     <Content Include="Views\Entrega\Crear.cshtml" />
     <Content Include="Views\Entrega\Index.cshtml" />
+    <Content Include="Views\Notificacion\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

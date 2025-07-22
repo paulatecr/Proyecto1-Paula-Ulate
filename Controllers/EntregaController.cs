@@ -12,6 +12,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
         private readonly EntregaRepository entregaRepo;
         private readonly SolicitudRepository solicitudRepo;
         private readonly RepuestoRepository repuestoRepo;
+        private readonly string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["ConexionBaseDatos"].ConnectionString;
 
         public EntregaController()
         {
@@ -87,6 +88,26 @@ namespace Proyecto1_Paula_Ulate.Controllers
             entrega.FechaEntrega = DateTime.Now;
             entrega.EntregadoPor = usuario.UsuarioID;
             entregaRepo.Insertar(entrega);
+
+            var usuarioRepo = new UsuarioRepository(connectionString);
+            var usuariosMecanicos = usuarioRepo.ObtenerTodos()
+                .Where(u => u.Rol == "Mecanico").ToList();
+
+            var mensajeEntrega = $"📦 Nueva Entrega {entrega.Codigo} del repuesto {repuesto.Codigo} - {repuesto.Nombre}, entregado por {usuario.Nombre}";
+            var notiRepo = new NotificacionRepository(connectionString);
+
+            foreach (var mecanico in usuariosMecanicos)
+            {
+                var noti = new Notificacion
+                {
+                    UsuarioId = mecanico.Id,
+                    Mensaje = mensajeEntrega,
+                    Estado = "Nuevo",
+                    Fecha = DateTime.Now
+
+                };
+                notiRepo.Insertar(noti);
+            }
 
             // Calcular total entregado y actualizar estado de solicitud
             var entregas = entregaRepo.ObtenerPorSolicitudId(entrega.SolicitudId);
