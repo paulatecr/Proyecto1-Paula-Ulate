@@ -13,7 +13,6 @@ namespace Proyecto1_Paula_Ulate.Controllers
         private readonly RepuestoRepository repuestoRepo;
         private readonly UsuarioRepository usuarioRepo;
         private readonly NotificacionRepository notificacionRepo;
-        private readonly string connectionString;
 
         public SolicitudController()
         {
@@ -40,14 +39,9 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 return RedirectToAction("Index", "Home");
 
             if (repuestoId.HasValue)
-            {
-                var repuesto = repuestoRepo.ObtenerPorId(repuestoId.Value);
-                ViewBag.Repuesto = repuesto;
-            }
+                ViewBag.Repuesto = repuestoRepo.ObtenerPorId(repuestoId.Value);
             else
-            {
                 ViewBag.Repuesto = null;
-            }
 
             var solicitud = new Solicitud
             {
@@ -79,12 +73,16 @@ namespace Proyecto1_Paula_Ulate.Controllers
             solicitud.Estado = "Nueva";
 
             if (solicitud.CantidadSolicitada > repuesto.CantidadDisponible)
-            {
                 TempData["Advertencia"] = "No hay suficiente cantidad. Se procesará parcialmente.";
-            }
 
+            // Insertar solicitud
             repositorio.Insertar(solicitud);
 
+            // Generar código de solicitud basado en el ID recién asignado
+            solicitud.Codigo = "S-" + solicitud.Id.ToString("D3");
+            repositorio.ActualizarCodigo(solicitud.Id, solicitud.Codigo); // Este método debe existir en tu repositorio
+
+            // Enviar notificaciones a encargados
             var usuariosEncargados = usuarioRepo.ObtenerTodos()
                 .Where(u => u.Rol == "Encargado").ToList();
 
@@ -106,7 +104,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
             return RedirectToAction("Index");
         }
 
-        /// GET: Solicitud/Editar
+        // GET: Solicitud/Editar
         public ActionResult Editar(int id)
         {
             var solicitud = repositorio.BuscarPorId(id);
@@ -116,11 +114,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Obtener el repuesto actual de la solicitud
-            var repuestoActual = repuestoRepo.ObtenerPorId(solicitud.RepuestoId);
-            solicitud.Repuesto = repuestoActual;
-
-            // Para el dropdown con todos los repuestos
+            solicitud.Repuesto = repuestoRepo.ObtenerPorId(solicitud.RepuestoId);
             ViewBag.Repuestos = repuestoRepo.ObtenerTodos();
 
             return View(solicitud);
@@ -134,7 +128,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
             if (usuario == null)
                 return RedirectToAction("Index", "Home");
 
-            solicitud.Solicitante = usuario.UsuarioID; // Asignar solicitante aquí
+            solicitud.Solicitante = usuario.UsuarioID;
 
             try
             {
@@ -145,7 +139,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Error al actualizar: " + ex.Message;
-                ViewBag.Repuestos = repuestoRepo.ObtenerTodos(); // Si quieres que vuelva a cargar la vista con el drop
+                ViewBag.Repuestos = repuestoRepo.ObtenerTodos();
                 return View(solicitud);
             }
         }
@@ -165,7 +159,7 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 Solicitante = usuario.UsuarioID
             };
 
-            return View(solicitud); // Vista: CrearDesdeBoton.cshtml
+            return View(solicitud);
         }
 
         // POST: Solicitud/CrearDesdeBoton
@@ -191,6 +185,26 @@ namespace Proyecto1_Paula_Ulate.Controllers
                 TempData["Advertencia"] = "No hay suficiente cantidad. Se procesará parcialmente.";
 
             repositorio.Insertar(solicitud);
+            solicitud.Codigo = "S-" + solicitud.Id.ToString("D3");
+            repositorio.ActualizarCodigo(solicitud.Id, solicitud.Codigo);
+
+            var usuariosEncargados = usuarioRepo.ObtenerTodos()
+                .Where(u => u.Rol == "Encargado").ToList();
+
+            var mensaje = $"🔔 Nueva Solicitud {solicitud.Codigo} del repuesto {repuesto.Codigo} - {repuesto.Nombre} realizada por {usuario.Nombre}";
+
+            foreach (var encargado in usuariosEncargados)
+            {
+                var noti = new Notificacion
+                {
+                    UsuarioId = encargado.Id,
+                    Mensaje = mensaje,
+                    Estado = "Nuevo",
+                    Fecha = DateTime.Now
+                };
+                notificacionRepo.Insertar(noti);
+            }
+
             TempData["Mensaje"] = "Solicitud creada correctamente.";
             return RedirectToAction("Index");
         }

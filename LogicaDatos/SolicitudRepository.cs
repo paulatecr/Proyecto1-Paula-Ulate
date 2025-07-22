@@ -200,5 +200,20 @@ namespace Proyecto1_Paula_Ulate.LogicaDatos
 
             return solicitud;
         }
+
+        public void ActualizarCodigo(int id, string codigo)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "UPDATE Solicitud SET Codigo = @Codigo WHERE Id = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Codigo", codigo);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }
